@@ -1,40 +1,50 @@
 {% extends "base.html" %}
 
-{% block title %}Connexion{% endblock %}
+{% block title %}Connexion - Microfinance{% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-6 col-lg-5">
-            <!-- Message de bienvenue motivant -->
-            <div class="text-center mb-4">
-                <div class="bg-primary text-white rounded-circle p-3 d-inline-block mb-3">
-                    <span style="font-size: 48px;">🏦</span>
+            <!-- Message de bienvenue motivant modernisé -->
+            <div class="text-center mb-4 animate-in">
+                <div class="logo-wrapper mb-3">
+                    <div class="logo-circle">
+                        <i class="fas fa-hand-holding-usd fa-3x"></i>
+                    </div>
                 </div>
-                <h2 class="mb-2">MicRoF by MediLogic</h2>
-                <div class="alert alert-info mt-3">
+                <h2 class="mb-2 gradient-text">MicRoF by MediLogic</h2>
+                <p class="text-muted">Votre partenaire financier de confiance</p>
+                <div class="alert alert-modern mt-3">
+                    <i class="fas fa-quote-left me-2 text-primary"></i>
                     <small>
                         {% set messages = [
                             "✨ Ensemble, bâtissons un avenir financier solide",
                             "🌱 La microfinance, un levier pour l'émergence",
                             "🤝 Votre partenaire de confiance pour l'inclusion financière",
                             "💪 Donnons vie aux projets de nos communautés",
-                            "🎯 Votre succès est notre mission"
+                            "🎯 Votre succès est notre mission",
+                            "🏆 La microfinance au service du développement local",
+                            "🌟 Créons ensemble des opportunités durables"
                         ] %}
                         {{ messages|random }}
                     </small>
+                    <i class="fas fa-quote-right ms-2 text-primary"></i>
                 </div>
             </div>
             
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">🔐 Connexion</h3>
+            <div class="card shadow-lg border-0 rounded-4 animate-in" style="animation-delay: 0.1s;">
+                <div class="card-header bg-gradient-primary text-white rounded-top-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <h4 class="mb-0 text-center">
+                        <i class="fas fa-lock me-2"></i>Connexion sécurisée
+                    </h4>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     {% with messages = get_flashed_messages(with_categories=true) %}
                         {% if messages %}
                             {% for category, message in messages %}
-                                <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible fade show" role="alert">
+                                <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible fade show rounded-3" role="alert">
+                                    <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-triangle' }} me-2"></i>
                                     {{ message }}
                                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                                 </div>
@@ -43,26 +53,196 @@
                     {% endwith %}
                     
                     <form method="POST" action="">
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required placeholder="votre@email.com">
+                        <div class="mb-4">
+                            <label for="email" class="form-label fw-semibold">
+                                <i class="fas fa-envelope me-2 text-primary"></i>Email
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 rounded-start-3">
+                                    <i class="fas fa-envelope text-muted"></i>
+                                </span>
+                                <input type="email" class="form-control form-control-lg border-0 bg-light rounded-end-3" 
+                                       id="email" name="email" required 
+                                       placeholder="exemple@email.com" style="background: #f8f9fa;">
+                            </div>
                         </div>
                         
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Mot de passe</label>
-                            <input type="password" class="form-control" id="password" name="password" required placeholder="••••••">
+                        <div class="mb-4">
+                            <label for="password" class="form-label fw-semibold">
+                                <i class="fas fa-key me-2 text-primary"></i>Mot de passe
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 rounded-start-3">
+                                    <i class="fas fa-lock text-muted"></i>
+                                </span>
+                                <input type="password" class="form-control form-control-lg border-0 bg-light rounded-end-3" 
+                                       id="password" name="password" required 
+                                       placeholder="••••••••" style="background: #f8f9fa;">
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword" style="border: none; background: #f8f9fa;">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
                         </div>
                         
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">Se connecter</button>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-gradient-primary btn-lg rounded-3" 
+                                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                                <i class="fas fa-sign-in-alt me-2"></i>Se connecter
+                            </button>
+                        </div>
+                        
+                        <!-- Liens supplémentaires -->
+                        <div class="text-center mt-4">
+                            <a href="#" class="text-decoration-none small text-muted">
+                                <i class="fas fa-question-circle me-1"></i>Mot de passe oublié ?
+                            </a>
                         </div>
                     </form>
                 </div>
-                <div class="card-footer text-center">
-                    <small>Pas encore inscrit ? <a href="{{ url_for('auth.register') }}">Créer un compte</a></small>
+                <div class="card-footer text-center bg-light rounded-bottom-4 border-0">
+                    <small class="text-muted">
+                        Pas encore inscrit ? 
+                        <a href="{{ url_for('auth.register') }}" class="text-decoration-none fw-semibold">
+                            <i class="fas fa-user-plus me-1"></i>Créer un compte
+                        </a>
+                    </small>
                 </div>
+            </div>
+            
+            <!-- Informations de sécurité -->
+            <div class="text-center mt-4">
+                <small class="text-muted">
+                    <i class="fas fa-shield-alt me-1"></i> Connexion sécurisée SSL
+                    <span class="mx-2">•</span>
+                    <i class="fas fa-lock me-1"></i> Données chiffrées
+                </small>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    /* Styles additionnels */
+    .logo-wrapper {
+        margin-bottom: 1rem;
+    }
+    
+    .logo-circle {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.3);
+        transition: transform 0.3s ease;
+    }
+    
+    .logo-circle:hover {
+        transform: scale(1.05);
+    }
+    
+    .logo-circle i {
+        color: white;
+    }
+    
+    .gradient-text {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+    }
+    
+    .alert-modern {
+        background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+        border: none;
+        border-radius: 15px;
+        padding: 0.75rem 1rem;
+        color: #166534;
+    }
+    
+    .btn-gradient-primary {
+        transition: all 0.3s ease;
+    }
+    
+    .btn-gradient-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px -5px rgba(102, 126, 234, 0.4);
+    }
+    
+    .rounded-4 {
+        border-radius: 20px !important;
+    }
+    
+    .rounded-top-4 {
+        border-radius: 20px 20px 0 0 !important;
+    }
+    
+    .rounded-bottom-4 {
+        border-radius: 0 0 20px 20px !important;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .animate-in {
+        animation: fadeInUp 0.5s ease-out forwards;
+        opacity: 0;
+    }
+    
+    .animate-in:nth-child(1) { animation-delay: 0s; }
+    .animate-in:nth-child(2) { animation-delay: 0.1s; }
+    
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.2) !important;
+    }
+    
+    /* Animation pour l'icône de l'œil */
+    #togglePassword i {
+        transition: all 0.3s;
+    }
+    
+    #togglePassword:hover i {
+        color: #667eea;
+    }
+</style>
+
+<script>
+    // Toggle password visibility
+    const togglePassword = document.querySelector('#togglePassword');
+    const password = document.querySelector('#password');
+    
+    if (togglePassword && password) {
+        togglePassword.addEventListener('click', function() {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            this.querySelector('i').classList.toggle('fa-eye');
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+    }
+    
+    // Animation au chargement
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.animate-in');
+        cards.forEach((card, index) => {
+            card.style.animation = `fadeInUp 0.5s ease-out forwards ${index * 0.1}s`;
+        });
+    });
+</script>
 {% endblock %}

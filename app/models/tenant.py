@@ -11,8 +11,13 @@ class Tenant(db.Model):
     phone = db.Column(db.String(20))
     address = db.Column(db.Text)
     logo = db.Column(db.String(500))
-    is_active = db.Column(db.Boolean, default=True)
+    status = db.Column(db.String(20), default='pending')
+    is_active = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relation avec User (back_populates explicite)
+    user_list = db.relationship('User', back_populates='tenant', lazy='dynamic')
     
     def __repr__(self):
         return f'<Tenant {self.name}>'

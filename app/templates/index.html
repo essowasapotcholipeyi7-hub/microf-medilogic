@@ -1,25 +1,96 @@
 {% extends "base.html" %}
 
-{% block title %}Accueil{% endblock %}
+{% block title %}Accueil - MicRoF by MediLogic{% endblock %}
 
 {% block content %}
 <div class="container">
-    <div class="text-center py-5">
-        <h1 class="display-4">MicRoF by MediLogic</h1>
-        <p class="lead">Plateforme de gestion complète pour institutions de microfinance</p>
-        <hr class="my-4">
-        <div class="row justify-content-center">
+    <div class="text-center py-5 mt-3">
+        <!-- Logo/icône simple -->
+        <div class="mb-4">
+            <div class="logo-simple mx-auto">
+                <i class="fas fa-hand-holding-usd fa-3x text-primary"></i>
+            </div>
+        </div>
+        
+        <!-- Titre -->
+        <h1 class="display-5 fw-bold mb-3">
+            MicRoF <span class="text-primary">by MediLogic</span>
+        </h1>
+        
+        <!-- Description -->
+        <p class="lead text-muted mb-4">
+            Plateforme de gestion complète pour institutions de microfinance
+        </p>
+        
+        <!-- Ligne décorative simple -->
+        <div class="mx-auto" style="width: 80px; height: 3px; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 3px;"></div>
+        
+        <!-- Boutons d'action -->
+        <div class="row justify-content-center mt-5">
             <div class="col-md-6">
-                <div class="d-grid gap-3">
-                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
-                        Créer mon compte institution
+                <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg px-4">
+                        <i class="fas fa-user-plus me-2"></i>Créer mon compte
                     </a>
-                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary btn-lg">
-                        Se connecter
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary btn-lg px-4">
+                        <i class="fas fa-sign-in-alt me-2"></i>Se connecter
                     </a>
                 </div>
             </div>
         </div>
+        
+        <!-- Petit message informatif -->
+        <div class="mt-5 pt-3">
+            <small class="text-muted">
+                <i class="fas fa-shield-alt me-1"></i> Plateforme sécurisée | 
+                <i class="fas fa-headset ms-2 me-1"></i> Support disponible
+            </small>
+        </div>
     </div>
 </div>
+
+<style>
+    .logo-simple {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #667eea15, #764ba215);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.3s ease;
+    }
+    
+    .logo-simple:hover {
+        transform: scale(1.05);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-outline-secondary {
+        transition: transform 0.2s ease;
+    }
+    
+    .btn-outline-secondary:hover {
+        transform: translateY(-2px);
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .text-center {
+        animation: fadeIn 0.5s ease-out;
+    }
+</style>
 {% endblock %}

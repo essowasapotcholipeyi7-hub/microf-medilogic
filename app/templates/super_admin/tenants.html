@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion des microfinances{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>🏦 Gestion des microfinances</h1>
+    </div>
+    
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Telephone</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tenant in tenants|sort(attribute='created_at', reverse=true) %}
+                        <tr>
+                            <td>{{ tenant.created_at.strftime('%d/%m/%Y') }}</td>
+                            <td><strong>{{ tenant.name }}</strong></td>
+                            <td>{{ tenant.email }}</td>
+                            <td>{{ tenant.phone or '-' }}</td>
+                            <td>
+                                {% if tenant.status == 'pending' %}
+                                    <span class="badge bg-warning">En attente</span>
+                                {% elif tenant.status == 'approved' %}
+                                    <span class="badge bg-success">Approuvee</span>
+                                {% elif tenant.status == 'rejected' %}
+                                    <span class="badge bg-danger">Rejetee</span>
+                                {% elif tenant.status == 'suspended' %}
+                                    <span class="badge bg-secondary">Suspendue</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ tenant.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <!-- Boutons pour statut PENDING -->
+                                {% if tenant.status == 'pending' %}
+                                    <a href="{{ url_for('super_admin.approve_tenant', id=tenant.id) }}" class="btn btn-success btn-sm" onclick="return confirm('Approuver cette microfinance ?')">
+                                        Approuver
+                                    </a>
+                                    <a href="{{ url_for('super_admin.reject_tenant', id=tenant.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Rejeter cette microfinance ?')">
+                                        Rejeter
+                                    </a>
+                                {% endif %}
+                                
+                                <!-- Boutons pour statut APPROVED -->
+                                {% if tenant.status == 'approved' %}
+                                    <a href="{{ url_for('super_admin.suspend_tenant', id=tenant.id) }}" class="btn btn-warning btn-sm" onclick="return confirm('Suspendre cette microfinance ?')">
+                                        Suspendre
+                                    </a>
+                                {% endif %}
+                                
+                                <!-- Boutons pour statut SUSPENDED -->
+                                {% if tenant.status == 'suspended' %}
+                                    <a href="{{ url_for('super_admin.activate_tenant', id=tenant.id) }}" class="btn btn-success btn-sm" onclick="return confirm('Reactiver cette microfinance ?')">
+                                        Reactiver
+                                    </a>
+                                {% endif %}
+                                
+                                <!-- Bouton DELETE toujours visible -->
+                                <a href="{{ url_for('super_admin.delete_tenant', id=tenant.id) }}" class="btn btn-secondary btn-sm" onclick="return confirm('Supprimer definitivement cette microfinance ?')">
+                                    Supprimer
+                                </a>
+                             </a>
+                         </a>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">Aucune microfinance enregistree</a></td>
+                         </a>
+                        {% endfor %}
+                    </tbody>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

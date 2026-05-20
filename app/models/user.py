@@ -7,23 +7,20 @@ class User(UserMixin, db.Model):
     __tablename__ = 'users'
     
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    tenant_id = db.Column(db.String(36), db.ForeignKey('tenants.id'), nullable=False)
+    tenant_id = db.Column(db.String(36), db.ForeignKey('tenants.id'), nullable=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
     first_name = db.Column(db.String(100))
     last_name = db.Column(db.String(100))
     phone = db.Column(db.String(20))
-    gender = db.Column(db.String(10))  # AJOUTER CETTE LIGNE
-    role = db.Column(db.String(50), default='admin')
+    gender = db.Column(db.String(10))
+    role = db.Column(db.String(50), default='agent')
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
-    tenant = db.relationship('Tenant', backref='users')
-    
-    @property
-    def full_name(self):
-        return f"{self.first_name or ''} {self.last_name or ''}".strip() or self.username
+    # Relation avec Tenant (sans backref ici pour eviter conflit)
+    tenant = db.relationship('Tenant', foreign_keys=[tenant_id], back_populates='user_list')
     
     def set_password(self, password):
         from app import bcrypt
@@ -32,3 +29,10 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         from app import bcrypt
         return bcrypt.check_password_hash(self.password_hash, password)
+    
+    @property
+    def full_name(self):
+        return f"{self.first_name or ''} {self.last_name or ''}".strip() or self.username
+    
+    def __repr__(self):
+        return f'<User {self.username}>'

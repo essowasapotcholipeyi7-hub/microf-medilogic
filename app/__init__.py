@@ -31,6 +31,7 @@ def create_app():
     
     # Importation des blueprints
     from app.routes import auth, dashboard, clients, products, credit_requests, contracts, reports, holidays, groups, cash, savings, users
+    from app.routes import super_admin
     app.register_blueprint(auth.bp)
     app.register_blueprint(dashboard.bp)
     app.register_blueprint(clients.bp)
@@ -43,6 +44,8 @@ def create_app():
     app.register_blueprint(cash.bp)
     app.register_blueprint(savings.bp)
     app.register_blueprint(users.bp)
+    app.register_blueprint(super_admin.bp)
+
 
 
     @app.route('/')

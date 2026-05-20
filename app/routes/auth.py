@@ -11,33 +11,34 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        # Créer la microfinance
+        # Creer la microfinance avec statut 'pending'
         tenant = Tenant(
             name=form.name.data,
             email=form.email.data,
             phone=form.phone.data,
             address=form.address.data,
-            is_active=True
+            status='pending',     # En attente d'approbation
+            is_active=False       # Desactive jusqu'a approbation
         )
         db.session.add(tenant)
-        db.session.flush()  # Pour obtenir l'ID du tenant
+        db.session.flush()
         
-        # Créer l'administrateur
+        # Creer l'administrateur (desactive aussi)
         admin = User(
             tenant_id=tenant.id,
             username=form.email.data,
             email=form.email.data,
             first_name=form.admin_name.data,
             role='admin',
-            is_active=True
+            is_active=False       # Desactive jusqu'a approbation
         )
         admin.set_password(form.admin_password.data)
         db.session.add(admin)
         
         db.session.commit()
         
-        flash('Votre microfinance a été créée avec succès ! Vous pouvez maintenant vous connecter.', 'success')
-        return redirect(url_for('auth.login'))
+        flash('Votre demande d\'inscription a ete envoyee. Elle sera traitee sous 48h.', 'success')
+        return redirect(url_for('auth.pending'))
     
     return render_template('auth/register.html', form=form)
 
@@ -50,14 +51,25 @@ def login():
         user = User.query.filter_by(email=email).first()
         
         if user and user.check_password(password):
+            # Verifier si l'utilisateur est actif
+            if not user.is_active:
+                flash('Votre compte est en attente de validation. Veuillez patienter.', 'warning')
+                return redirect(url_for('auth.login'))
+            
+            # Verifier si la microfinance est active (sauf super admin)
+            if user.role != 'super_admin':
+                if user.tenant and not user.tenant.is_active:
+                    flash('Votre microfinance est en attente de validation.', 'warning')
+                    return redirect(url_for('auth.login'))
+            
             login_user(user)
             flash(f'Bienvenue {user.first_name or user.username}!', 'success')
             
-            # Redirection selon le rôle
-            if user.role == 'admin':
+            if user.role == 'super_admin':
+                return redirect(url_for('super_admin.tenants'))
+            elif user.role == 'admin':
                 return redirect(url_for('dashboard.index'))
             else:
-                # Pour les agents, rediriger vers la liste des clients
                 return redirect(url_for('clients.index'))
         else:
             flash('Email ou mot de passe incorrect', 'danger')

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Inscription en attente{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="mb-4">
+                        <span style="font-size: 64px;">⏳</span>
+                    </div>
+                    <h3>Inscription en attente de validation</h3>
+                    <p class="mt-3">Votre demande d'inscription a bien ete envoyee.</p>
+                    <p>Un administrateur va examiner votre dossier et vous serez notifie par email des qu'il sera active.</p>
+                    <p class="text-muted">Cette operation peut prendre jusqu'a 48h.</p>
+                    <hr>
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Retour a la page de connexion</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
