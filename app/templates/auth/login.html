@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <!-- Message de bienvenue motivant -->
+            <div class="text-center mb-4">
+                <div class="bg-primary text-white rounded-circle p-3 d-inline-block mb-3">
+                    <span style="font-size: 48px;">🏦</span>
+                </div>
+                <h2 class="mb-2">MicRoF by MediLogic</h2>
+                <div class="alert alert-info mt-3">
+                    <small>
+                        {% set messages = [
+                            "✨ Ensemble, bâtissons un avenir financier solide",
+                            "🌱 La microfinance, un levier pour l'émergence",
+                            "🤝 Votre partenaire de confiance pour l'inclusion financière",
+                            "💪 Donnons vie aux projets de nos communautés",
+                            "🎯 Votre succès est notre mission"
+                        ] %}
+                        {{ messages|random }}
+                    </small>
+                </div>
+            </div>
+            
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">🔐 Connexion</h3>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <form method="POST" action="">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required placeholder="votre@email.com">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Mot de passe</label>
+                            <input type="password" class="form-control" id="password" name="password" required placeholder="••••••">
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">Se connecter</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <small>Pas encore inscrit ? <a href="{{ url_for('auth.register') }}">Créer un compte</a></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

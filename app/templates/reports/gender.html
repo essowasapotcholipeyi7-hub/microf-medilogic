@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Statistiques par genre{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">👥 Statistiques par genre</h1>
+    
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">👨 Hommes</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Nombre de clients :</strong> {{ male_clients }}</p>
+                    <p><strong>Total crédits :</strong> {{ "{:,.0f}".format(male_loans) }} FCFA</p>
+                    <p><strong>Taux remboursement :</strong> {{ "%.1f"|format(male_rate) }}%</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0">👩 Femmes</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Nombre de clients :</strong> {{ female_clients }}</p>
+                    <p><strong>Total crédits :</strong> {{ "{:,.0f}".format(female_loans) }} FCFA</p>
+                    <p><strong>Taux remboursement :</strong> {{ "%.1f"|format(female_rate) }}%</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">📊 Comparaison</h5>
+                </div>
+                <div class="card-body">
+                    <div class="progress mb-3" style="height: 30px;">
+                        <div class="progress-bar bg-info" style="width: {{ (male_clients / total_clients * 100) if total_clients > 0 else 0 }}%">
+                            Hommes: {{ male_clients }}
+                        </div>
+                        <div class="progress-bar bg-warning" style="width: {{ (female_clients / total_clients * 100) if total_clients > 0 else 0 }}%">
+                            Femmes: {{ female_clients }}
+                        </div>
+                    </div>
+                    
+                    <div class="progress" style="height: 30px;">
+                        <div class="progress-bar bg-info" style="width: {{ (male_loans / (male_loans + female_loans) * 100) if (male_loans + female_loans) > 0 else 0 }}%">
+                            Crédits Hommes
+                        </div>
+                        <div class="progress-bar bg-warning" style="width: {{ (female_loans / (male_loans + female_loans) * 100) if (male_loans + female_loans) > 0 else 0 }}%">
+                            Crédits Femmes
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <a href="{{ url_for('reports.index') }}" class="btn btn-secondary">← Retour</a>
+    </div>
+</div>
+{% endblock %}

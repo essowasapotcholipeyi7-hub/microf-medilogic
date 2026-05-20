@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Rapports{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">📊 Rapports et Statistiques</h1>
+    
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">👥 Rapports par genre</h5>
+                </div>
+                <div class="card-body text-center">
+                    <p>Analyse des clients et crédits par sexe</p>
+                    <a href="{{ url_for('reports.gender_stats') }}" class="btn btn-primary">Voir les statistiques</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">👨‍💼 Performance des agents</h5>
+                </div>
+                <div class="card-body text-center">
+                    <p>Suivi des performances par agent de terrain</p>
+                    <a href="{{ url_for('reports.agents_stats') }}" class="btn btn-success">Voir les statistiques</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">📈 Tableau de bord exécutif</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row" id="dashboardStats">
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h3 id="totalClients">-</h3>
+                                    <p class="text-muted">Clients</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h3 id="activeLoans">-</h3>
+                                    <p class="text-muted">Crédits actifs</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h3 id="pendingRequests">-</h3>
+                                    <p class="text-muted">Demandes en attente</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h3 id="recoveryRate">-</h3>
+                                    <p class="text-muted">Taux recouvrement</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    fetch('/reports/dashboard-stats')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('totalClients').innerText = data.total_clients;
+            document.getElementById('activeLoans').innerText = data.total_active_loans;
+            document.getElementById('pendingRequests').innerText = data.pending_requests;
+            document.getElementById('recoveryRate').innerText = data.recovery_rate.toFixed(1) + '%';
+        });
+</script>
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends "base_print.html" %}
+
+{% block title %}Recu - {{ transaction.transaction_type|capitalize }} epargne{% endblock %}
+
+{% block content %}
+<div class="receipt-container">
+    <!-- En-tete compact -->
+    <div class="text-center mb-3">
+        <h3 class="mb-1">{{ transaction.tenant.name }}</h3>
+        <p class="mb-0 small">{{ transaction.tenant.address or 'Adresse non renseignee' }}</p>
+        <p class="small">Tel: {{ transaction.tenant.phone or 'Non renseigne' }} | Email: {{ transaction.tenant.email }}</p>
+        <hr class="my-2">
+        <h4 class="mt-2">
+            {% if transaction.transaction_type == 'deposit' %}
+                RECU DE DEPOT D'EPARGNE
+            {% else %}
+                RECU DE RETRAIT D'EPARGNE
+            {% endif %}
+        </h4>
+        <p class="small">N° {{ transaction.id[:8].upper() }}</p>
+    </div>
+
+    <!-- PARTIE CLIENT (haut) -->
+    <div class="client-part border p-2 mb-3">
+        <div class="text-center bg-light py-1">
+            <strong>PARTIE CLIENT - A CONSERVER</strong>
+            <span class="mx-2">|</span>
+        </div>
+        
+        <div class="row mt-2">
+            <div class="col-7">
+                <table class="table table-sm table-borderless mb-0">
+                    <tr><td width="40%"><strong>Client</strong></td><td>{{ transaction.account.client.full_name }}</td></tr>
+                    <tr><td><strong>Tel</strong></td><td>{{ transaction.account.client.phone }}</td></tr>
+                    <tr><td><strong>N° Compte</strong></td><td>{{ transaction.account.account_number }}</td></tr>
+                    <tr><td><strong>Operation</strong></td><td>{% if transaction.transaction_type == 'deposit' %}DEPOT{% else %}RETRAIT{% endif %}</td></tr>
+                    <tr><td><strong>Montant</strong></td><td><strong>{{ "{:,.0f}".format(transaction.amount) }} FCFA</strong></td></tr>
+                    <tr><td><strong>Date</strong></td><td>{{ transaction.created_at.strftime('%d/%m/%Y %H:%M') }}</td></tr>
+                    <tr><td><strong>Nouveau solde</strong></td><td>{{ "{:,.0f}".format(transaction.balance_after) }} FCFA</td></tr>
+                </table>
+            </div>
+            <div class="col-5">
+                <div class="border text-center p-2" style="height: 100%;">
+                    <small>Signature du client</small>
+                    <hr class="my-4">
+                    <small>Signature du caissier</small>
+                </div>
+            </div>
+        </div>
+        <div class="small text-muted mt-2">{{ transaction.description or 'Aucune description' }}</div>
+    </div>
+
+    <!-- LIGNE DE COUPURE -->
+    <div class="text-center my-2">
+        <hr class="border-2 border-dark border-top dashed">
+        <span class="bg-white px-3" style="margin-top: -12px; display: inline-block;">✂️ ✂️ ✂️ COUPEZ ICI ✂️ ✂️ ✂️</span>
+        <hr class="border-2 border-dark border-top dashed">
+    </div>
+
+    <!-- PARTIE MICROFINANCE (bas) -->
+    <div class="microfinance-part border p-2 mt-2">
+        <div class="text-center bg-light py-1">
+            <strong>PARTIE MICROFINANCE - A CONSERVER</strong>
+        </div>
+        
+        <div class="row mt-2">
+            <div class="col-6">
+                <table class="table table-sm table-borderless mb-0">
+                    <tr><td width="40%"><strong>Client</strong></td><td>{{ transaction.account.client.full_name }}</td></tr>
+                    <tr><td><strong>Tel</strong></td><td>{{ transaction.account.client.phone }}</td></tr>
+                    <tr><td><strong>N° Compte</strong></td><td>{{ transaction.account.account_number }}</td></tr>
+                    <tr><td><strong>Taux</strong></td><td>{{ transaction.account.interest_rate }}%</td></tr>
+                    <tr><td><strong>Operation</strong></td><td>{% if transaction.transaction_type == 'deposit' %}DEPOT{% else %}RETRAIT{% endif %}</td></tr>
+                    <tr><td><strong>Montant</strong></td><td>{{ "{:,.0f}".format(transaction.amount) }} FCFA</td></tr>
+                    <tr><td><strong>Date</strong></td><td>{{ transaction.created_at.strftime('%d/%m/%Y %H:%M') }}</td></tr>
+                    <tr><td><strong>Solde apres</strong></td><td>{{ "{:,.0f}".format(transaction.balance_after) }} FCFA</td></tr>
+                    <tr><td><strong>Agent</strong></td><td>{{ transaction.user.full_name if transaction.user else 'Systeme' }}</td></tr>
+                </table>
+            </div>
+            <div class="col-6">
+                <table class="table table-sm table-bordered mb-0">
+                    <thead class="table-light">
+                        <tr><th>Date</th><th>Type</th><th>Montant</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for trans in recent_transactions[:4] %}
+                        <tr>
+                            <td>{{ trans.created_at.strftime('%d/%m') }}</a></a></td>
+                            <td>{% if trans.transaction_type == 'deposit' %}Depot{% elif trans.transaction_type == 'withdrawal' %}Retrait{% else %}Interets{% endif %}</a></a></td>
+                            <td>{{ "{:,.0f}".format(trans.amount) }}</a></a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="mt-2">
+                    <div class="row">
+                        <div class="col-6 border text-center pt-3 pb-1">
+                            <small>Signature client</small>
+                            <hr>
+                        </div>
+                        <div class="col-6 border text-center pt-3 pb-1">
+                            <small>Cachet + signature</small>
+                            <hr>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pied de page compact -->
+    <div class="footer text-center mt-3 pt-2 border-top">
+        <small>Document genere le {{ now.strftime('%d/%m/%Y %H:%M') }} - {{ transaction.tenant.name }}</small>
+    </div>
+</div>
+
+<style>
+    @media print {
+        body { margin: 0; padding: 0; }
+        .receipt-container { width: 100%; padding: 10px; }
+        .btn-print, .btn-back { display: none; }
+        .client-part, .microfinance-part { break-inside: avoid; page-break-inside: avoid; }
+        .bg-light { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .dashed { border: 1px dashed #000 !important; }
+    }
+    
+    .receipt-container { font-family: Arial, sans-serif; font-size: 11px; }
+    .table-borderless td, .table-borderless th { border: none; padding: 2px 5px; }
+    .table-bordered td, .table-bordered th { border: 1px solid #ddd; padding: 3px 5px; font-size: 10px; }
+    .border { border: 1px solid #ddd !important; }
+    .border-2 { border-width: 2px !important; }
+    .border-top { border-top: 1px solid #ddd !important; }
+    .bg-light { background-color: #f8f9fa; }
+    hr { margin: 5px 0; }
+    .dashed { border-style: dashed; }
+</style>
+{% endblock %}

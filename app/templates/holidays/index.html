@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Jours fériés{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>📅 Jours fériés</h1>
+        <a href="{{ url_for('holidays.add') }}" class="btn btn-primary">
+            + Ajouter un jour férié
+        </a>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <label>Année à prévisualiser</label>
+                    <div class="input-group">
+                        <input type="number" id="yearPreview" class="form-control" value="2026">
+                        <button onclick="previewYear()" class="btn btn-info">Prévisualiser</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Type</th>
+                            <th>Date / Règle</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for holiday in holidays %}
+                        <tr>
+                            <td>{{ holiday.name }}</td>
+                            <td>
+                                {% if holiday.holiday_type == 'fixed' %}
+                                    <span class="badge bg-info">Fixe</span>
+                                {% else %}
+                                    <span class="badge bg-warning">Mobile</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if holiday.holiday_type == 'fixed' %}
+                                    {{ holiday.fixed_date }}
+                                {% else %}
+                                    {{ holiday.movable_rule }}
+                                    {% if holiday.year %} ({{ holiday.year }}){% endif %}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if holiday.is_active %}
+                                    <span class="badge bg-success">Actif</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactif</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('holidays.toggle', id=holiday.id) }}" class="btn btn-sm btn-info">
+                                        {% if holiday.is_active %}Désactiver{% else %}Activer{% endif %}
+                                    </a>
+                                    <a href="{{ url_for('holidays.delete', id=holiday.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer ce jour férié ?')">
+                                        Supprimer
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center">Aucun jour férié enregistré</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function previewYear() {
+    var year = document.getElementById('yearPreview').value;
+    window.location.href = '/holidays/preview/' + year;
+}
+</script>
+{% endblock %}

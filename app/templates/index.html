@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="text-center py-5">
+        <h1 class="display-4">MicRoF by MediLogic</h1>
+        <p class="lead">Plateforme de gestion complète pour institutions de microfinance</p>
+        <hr class="my-4">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="d-grid gap-3">
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
+                        Créer mon compte institution
+                    </a>
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary btn-lg">
+                        Se connecter
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

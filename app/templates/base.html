@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MicRoF by MediLogic - {% block title %}Gestion Microfinance{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .loading {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+        }
+        .loading.show {
+            display: block;
+        }
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            h1 { font-size: 1.8rem; }
+        }
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading" id="loadingSpinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Chargement...</span>
+        </div>
+    </div>
+    
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">MicRoF by MediLogic</a>
+            {% if current_user.is_authenticated %}
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">
+                    👤 {{ current_user.first_name or current_user.username }}
+                </span>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-sm btn-outline-danger">Déconnexion</a>
+            </div>
+            {% endif %}
+        </div>
+    </nav>
+    
+    <!-- SECTION DES MESSAGES FLASH (AJOUTÉE) -->
+    <div class="container mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible fade show" role="alert">
+                        <strong>
+                            {% if category == 'success' %}✅ Succès !
+                            {% elif category == 'danger' %}❌ Erreur !
+                            {% elif category == 'warning' %}⚠️ Attention !
+                            {% else %}ℹ️ Info
+                            {% endif %}
+                        </strong>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    
+    <main class="py-4">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Toast container pour notifications flottantes -->
+    <div class="toast-container">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000">
+            <div class="toast-header">
+                <strong class="me-auto" id="toastTitle">Notification</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="toastMessage">
+                Message
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Afficher le spinner lors de l'envoi des formulaires
+        function showLoading() {
+            document.getElementById('loadingSpinner').classList.add('show');
+        }
+        
+        document.querySelectorAll('form button[type="submit"]').forEach(btn => {
+            btn.addEventListener('click', showLoading);
+        });
+        
+        // Convertir les messages flash en toasts flottants
+        document.addEventListener('DOMContentLoaded', function() {
+            var alerts = document.querySelectorAll('.alert');
+            if (alerts.length > 0) {
+                var lastAlert = alerts[alerts.length - 1];
+                var message = lastAlert.innerText.trim();
+                var className = lastAlert.className;
+                
+                var title = '';
+                if (className.includes('success')) title = '✅ Succès !';
+                else if (className.includes('danger')) title = '❌ Erreur !';
+                else if (className.includes('warning')) title = '⚠️ Attention !';
+                else title = 'ℹ️ Info';
+                
+                // Afficher le toast
+                var toastEl = document.getElementById('liveToast');
+                document.getElementById('toastTitle').innerHTML = title;
+                document.getElementById('toastMessage').innerHTML = message;
+                var toast = new bootstrap.Toast(toastEl, { delay: 5000 });
+                toast.show();
+            }
+        });
+    </script>
+</body>
+</html>

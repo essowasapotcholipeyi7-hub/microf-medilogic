@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Ajouter un utilisateur{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">➕ Ajouter un utilisateur</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Prénom</label>
+                                <input type="text" name="first_name" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nom</label>
+                                <input type="text" name="last_name" class="form-control" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Nom d'utilisateur</label>
+                            <input type="text" name="username" class="form-control" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control" required>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Téléphone</label>
+                                <input type="text" name="phone" class="form-control">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Genre</label>
+                                <select name="gender" class="form-control">
+                                    <option value="male">👨 Homme</option>
+                                    <option value="female">👩 Femme</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Rôle</label>
+                            <select name="role" class="form-control" required>
+                                <option value="agent">👨‍💼 Agent de terrain</option>
+                                <option value="admin">👑 Administrateur</option>
+                            </select>
+                            <small class="text-muted">
+                                - Agent : peut gérer les clients et les demandes de crédit<br>
+                                - Administrateur : accès complet à toutes les fonctionnalités
+                            </small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Mot de passe</label>
+                            <input type="password" name="password" class="form-control" required>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Ajouter l'utilisateur</button>
+                            <a href="{{ url_for('users.list_users') }}" class="btn btn-secondary">Annuler</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

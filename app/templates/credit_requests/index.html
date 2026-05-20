@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Demandes de crédit{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>📝 Demandes de crédit</h1>
+        <a href="{{ url_for('credit_requests.new') }}" class="btn btn-primary">
+            + Nouvelle demande
+        </a>
+    </div>
+    
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Client</th>
+                            <th>Produit</th>
+                            <th>Montant</th>
+                            <th>Durée</th>
+                            <th>Statut</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in requests %}
+                        <tr>
+                            <td>{{ req.client.full_name }}</td>
+                            <td>{{ req.product.name }}</td>
+                            <td>{{ "{:,.0f}".format(req.amount_requested) }} FCFA</td>
+                            <td>{{ req.duration_months }} mois</td>
+                            <td>
+                                {% if req.status == 'pending' %}
+                                    <span class="badge bg-warning">⏳ En attente</span>
+                                {% elif req.status == 'approved' %}
+                                    <span class="badge bg-success">✅ Approuvé</span>
+                                {% elif req.status == 'rejected' %}
+                                    <span class="badge bg-danger">❌ Rejeté</span>
+                                {% elif req.status == 'disbursed' %}
+                                    <span class="badge bg-info">💰 Déboursé</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ req.created_at.strftime('%d/%m/%Y') }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('credit_requests.view', id=req.id) }}" class="btn btn-info">👁️ Voir</a>
+                                    {% if req.status == 'pending' %}
+                                        <a href="{{ url_for('credit_requests.approve', id=req.id) }}" class="btn btn-success">✓ Approuver</a>
+                                    {% endif %}
+                                    {% if req.status == 'approved' %}
+                                        <a href="{{ url_for('contracts.create', credit_request_id=req.id) }}" class="btn btn-success">💰 Débourser</a>
+                                    {% endif %}
+                                    <a href="{{ url_for('credit_requests.delete', id=req.id) }}" class="btn btn-danger" onclick="return confirm('Supprimer cette demande ?')">🗑️</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center">Aucune demande de crédit</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

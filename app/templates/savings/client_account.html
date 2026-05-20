@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Compte epargne - {{ client.full_name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Compte epargne de {{ client.full_name }}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="alert alert-info text-center">
+                                <small>Numero Compte</small>
+                                <h5>{{ account.account_number }}</h5>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="alert alert-success text-center">
+                                <small>Solde actuel</small>
+                                <h3>{{ "{:,.0f}".format(account.balance) }} FCFA</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="alert alert-warning text-center">
+                                <small>Taux d'interet</small>
+                                <h3>{{ account.interest_rate }}% / an</h3>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if pending_interest > 0 %}
+                    <div class="alert alert-info">
+                        <strong>Interets en cours :</strong> {{ "{:,.0f}".format(pending_interest) }} FCFA
+                        <a href="{{ url_for('savings.pay_interest', account_id=account.id) }}" class="btn btn-sm btn-success float-end">Verser les interets</a>
+                    </div>
+                    {% endif %}
+                    
+                    <hr>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0">Depot</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form method="POST" action="{{ url_for('savings.deposit', account_id=account.id) }}">
+                                        <div class="mb-3">
+                                            <label class="form-label">Montant (FCFA)</label>
+                                            <input type="number" name="amount" class="form-control" required min="1000" step="1000">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Description</label>
+                                            <input type="text" name="description" class="form-control" placeholder="Ex: Depot mensuel">
+                                        </div>
+                                        <button type="submit" class="btn btn-success w-100">Effectuer le depot</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-danger text-white">
+                                    <h5 class="mb-0">Retrait</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form method="POST" action="{{ url_for('savings.withdraw', account_id=account.id) }}">
+                                        <div class="mb-3">
+                                            <label class="form-label">Montant (FCFA)</label>
+                                            <input type="number" name="amount" class="form-control" required min="1000" step="1000">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Description</label>
+                                            <input type="text" name="description" class="form-control" placeholder="Ex: Retrait pour projet">
+                                        </div>
+                                        <button type="submit" class="btn btn-danger w-100">Effectuer le retrait</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-info text-white">
+                                    <h5 class="mb-0">Modifier le taux d'interet</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form method="POST" action="{{ url_for('savings.update_rate', account_id=account.id) }}">
+                                        <div class="mb-3">
+                                            <label class="form-label">Taux (%)</label>
+                                            <input type="number" name="interest_rate" class="form-control" step="0.5" value="{{ account.interest_rate }}" required>
+                                            <small class="text-muted">Taux annuel par defaut: 5%</small>
+                                        </div>
+                                        <button type="submit" class="btn btn-info w-100">Modifier le taux</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-secondary text-white">
+                                    <h5 class="mb-0">Historique des transactions</h5>
+                                </div>
+                                <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Type</th>
+                                                <th>Montant</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for t in transactions %}
+                                            <tr>
+                                                <td>{{ t.created_at.strftime('%d/%m/%Y') }}</td>
+                                                <td>
+                                                    {% if t.transaction_type == 'deposit' %}
+                                                        <span class="badge bg-success">Depot</span>
+                                                    {% elif t.transaction_type == 'withdrawal' %}
+                                                        <span class="badge bg-danger">Retrait</span>
+                                                    {% else %}
+                                                        <span class="badge bg-info">Interets</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ "{:,.0f}".format(t.amount) }} FCFA</td>
+                                                <td>
+                                                    <a href="{{ url_for('savings.print_receipt', transaction_id=t.id) }}" target="_blank" class="btn btn-sm btn-primary">
+                                                        Imprimer
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            {% else %}
+                                            <tr>
+                                                <td colspan="4" class="text-center">Aucune transaction</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('savings.index') }}" class="btn btn-secondary">Retour</a>
+                    <a href="{{ url_for('clients.index') }}" class="btn btn-outline-primary float-end">Gerer les clients</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

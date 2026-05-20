@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Statistiques - {{ agent.first_name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">📊 Performance de {{ agent.first_name }} {{ agent.last_name }}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="alert alert-info text-center">
+                                <h5>👥 Clients</h5>
+                                <h2>{{ clients_count }}</h2>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="alert alert-success text-center">
+                                <h5>💰 Crédits déboursés</h5>
+                                <h4>{{ "{:,.0f}".format(total_disbursed) }} FCFA</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="alert alert-warning text-center">
+                                <h5>📥 Montant recouvré</h5>
+                                <h4>{{ "{:,.0f}".format(total_recovered) }} FCFA</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="alert alert-secondary text-center">
+                                <h5>📊 Taux recouvrement</h5>
+                                <h2>{{ "%.1f"|format(recovery_rate) }}%</h2>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h5>📋 Clients suivis par l'agent</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Client</th>
+                                    <th>Genre</th>
+                                    <th>Téléphone</th>
+                                    <th>Total crédits</th>
+                                    <th>Remboursé</th>
+                                    <th>Taux</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in client_details %}
+                                <tr>
+                                    <td>{{ item.client.full_name }}</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                                    <td>{% if item.client.gender == 'male' %}♂ Homme{% else %}♀ Femme{% endif %}</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                                    <td>{{ item.client.phone or '-' }}</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                                    <td>{{ "{:,.0f}".format(item.total_loan) }} FCFA</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                                    <td>{{ "{:,.0f}".format(item.total_paid) }} FCFA</a></a></a></a></a></a></a></a></a></a></a>}</a></a></a></a></a></a></a></a></a></td>
+                                    <td>
+                                        <div class="progress" style="width: 80px;">
+                                            <div class="progress-bar bg-success" style="width: {{ item.rate }}%">
+                                                {{ "%.0f"|format(item.rate) }}%
+                                            </div>
+                                        </div>
+                                    </a>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center">Aucun client assigné à cet agent</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('users.agents') }}" class="btn btn-secondary">← Retour</a>
+                    <a href="{{ url_for('clients.add') }}?agent_id={{ agent.id }}" class="btn btn-primary float-end">➕ Assigner un client</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Créer un groupe solidaire{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">👥 Créer un groupe solidaire</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Nom du groupe</label>
+                            <input type="text" name="name" class="form-control" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" class="form-control" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Responsable du groupe</label>
+                            <select name="leader_id" class="form-control">
+                                <option value="">-- Sélectionner --</option>
+                                {% for client in clients %}
+                                <option value="{{ client.id }}">{{ client.full_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Créer le groupe</button>
+                            <a href="{{ url_for('groups.index') }}" class="btn btn-secondary">Annuler</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

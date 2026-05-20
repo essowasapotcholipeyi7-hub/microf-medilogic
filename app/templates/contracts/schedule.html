@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Échéancier - {{ contract.contract_number }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">📅 Échéancier du contrat {{ contract.contract_number }}</h3>
+        </div>
+        <div class="card-body">
+            <div class="text-center mb-4">
+                <h5>{{ contract.client.full_name }}</h5>
+                <p>Montant: {{ "{:,.0f}".format(contract.principal) }} FCFA | Taux: {{ contract.interest_rate }}% ({{ contract.interest_type }})</p>
+                <hr>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>N°</th>
+                            <th>Date échéance</th>
+                            <th>Montant</th>
+                            <th>Principal</th>
+                            <th>Intérêts</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for repayment in repayments %}
+                        <tr class="{% if repayment.status == 'paid' %}table-success{% endif %}">
+                            <td>{{ loop.index }}</td>
+                            <td>{{ repayment.due_date.strftime('%d/%m/%Y') }}</td>
+                            <td>{{ "{:,.0f}".format(repayment.due_amount) }} FCFA</td>
+                            <td>{{ "{:,.0f}".format(repayment.principal_part) }} FCFA</td>
+                            <td>{{ "{:,.0f}".format(repayment.interest_part) }} FCFA</td>
+                            <td>
+                                {% if repayment.status == 'paid' %}
+                                    ✅ Payé le {{ repayment.paid_date.strftime('%d/%m/%Y') }}
+                                {% else %}
+                                    ⏳ En attente
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot class="table-secondary">
+                        <tr>
+                            <th colspan="2">TOTAUX</th>
+                            <th>{{ "{:,.0f}".format(contract.total_amount) }} FCFA</th>
+                            <th>{{ "{:,.0f}".format(contract.principal) }} FCFA</th>
+                            <th>{{ "{:,.0f}".format(contract.total_interest) }} FCFA</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            
+            <div class="text-center mt-4">
+                <button onclick="window.print()" class="btn btn-primary">🖨️ Imprimer l'échéancier</button>
+                <a href="{{ url_for('contracts.view', id=contract.id) }}" class="btn btn-secondary">← Retour</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

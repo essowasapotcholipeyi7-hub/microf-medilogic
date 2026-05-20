@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Groupes solidaires{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>👥 Groupes solidaires</h1>
+        <a href="{{ url_for('groups.add') }}" class="btn btn-primary">
+            + Nouveau groupe
+        </a>
+    </div>
+    
+    <div class="row">
+        {% for group in groups %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">{{ group.name }}</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ group.description or 'Aucune description' }}</p>
+                    <hr>
+                    <p><strong>👥 Membres :</strong> {{ group.member_count }}</p>
+                    <p><strong>👤 Responsable :</strong> {{ group.leader.full_name if group.leader else 'Non défini' }}</p>
+                    <p><strong>💰 Dette solidaire :</strong> {{ "{:,.0f}".format(group.total_liability) }} FCFA</p>
+                </div>
+                <div class="card-footer bg-white">
+                    <div class="btn-group w-100">
+                        <a href="{{ url_for('groups.view', id=group.id) }}" class="btn btn-sm btn-info">👁️ Voir</a>
+                        <a href="{{ url_for('groups.group_loan', group_id=group.id) }}" class="btn btn-sm btn-success">💰 Prêt solidaire</a>
+                        <a href="{{ url_for('groups.delete', id=group.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer ce groupe ?')">🗑️ Supprimer</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                Aucun groupe solidaire. <a href="{{ url_for('groups.add') }}">Créez votre premier groupe</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

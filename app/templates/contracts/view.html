@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Détail contrat{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">📄 Contrat {{ contract.contract_number }}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <strong>Client :</strong>
+                            <p>{{ contract.client.full_name }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Produit :</strong>
+                            <p>{{ contract.product.name }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Statut :</strong>
+                            <p>
+                                {% if contract.status == 'active' %}
+                                    <span class="badge bg-success">Actif</span>
+                                {% else %}
+                                    <span class="badge bg-info">Terminé</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="alert alert-info text-center">
+                                <small>Montant emprunté</small>
+                                <h5>{{ "{:,.0f}".format(contract.principal) }} FCFA</h5>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="alert alert-warning text-center">
+                                <small>Intérêts</small>
+                                <h5>{{ "{:,.0f}".format(contract.total_interest) }} FCFA</h5>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="alert alert-success text-center">
+                                <small>Total à rembourser</small>
+                                <h5>{{ "{:,.0f}".format(contract.total_amount) }} FCFA</h5>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="alert alert-secondary text-center">
+                                <small>Mensualité</small>
+                                <h5>{{ "{:,.0f}".format(contract.monthly_payment) }} FCFA</h5>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-info text-white">
+                                    <h5>📊 Statistiques</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>✅ Remboursements effectués : {{ paid_count }}/{{ total_count }}</p>
+                                    <p>💰 Total déjà payé : {{ "{:,.0f}".format(total_paid) }} FCFA</p>
+                                    <p>📉 Reste à payer : {{ "{:,.0f}".format(remaining) }} FCFA</p>
+                                    <div class="progress">
+                                        {% set percent = (total_paid / contract.total_amount * 100) if contract.total_amount > 0 else 0 %}
+                                        <div class="progress-bar bg-success" style="width: {{ percent }}%">
+                                            {{ "%.1f"|format(percent) }}%
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-secondary text-white">
+                                    <h5>📅 Échéances</h5>
+                                </div>
+                                <div class="card-body">
+                                    <a href="{{ url_for('contracts.generate_schedule', contract_id=contract.id) }}" class="btn btn-primary w-100 mb-2">
+                                        📄 Voir l'échéancier complet
+                                    </a>
+                                    <a href="{{ url_for('contracts.print_contract', id=contract.id) }}" target="_blank" class="btn btn-success w-100">
+                                        🖨️ Imprimer le contrat
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h5>📋 Calendrier des remboursements</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Échéance</th>
+                                    <th>Montant dû</th>
+                                    <th>Principal</th>
+                                    <th>Intérêts</th>
+                                    <th>Statut</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for repayment in repayments %}
+                                <tr>
+                                    <td>{{ repayment.due_date.strftime('%d/%m/%Y') }}</a></td>
+                                    <td>{{ "{:,.0f}".format(repayment.due_amount) }} FCFA</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                                    <td>{{ "{:,.0f}".format(repayment.principal_part) }} FCFA</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                                    <td>{{ "{:,.0f}".format(repayment.interest_part) }} FCFA</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                                    <td>
+                                        {% if repayment.status == 'paid' %}
+                                            <span class="badge bg-success">✅ Payé le {{ repayment.paid_date.strftime('%d/%m/%Y') }}</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">⏳ En attente</span>
+                                        {% endif %}
+                                    </a>
+                                    <td>
+                                        {% if repayment.status == 'pending' %}
+                                            <form method="POST" action="{{ url_for('contracts.repay', repayment_id=repayment.id) }}">
+                                                <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Enregistrer ce remboursement ?')">
+                                                    💰 Encaisser
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </a>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <a href="{{ url_for('contracts.index') }}" class="btn btn-secondary">← Retour</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

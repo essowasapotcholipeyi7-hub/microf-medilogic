@@ -1,0 +1,277 @@
+{% extends "base_print.html" %}
+
+{% block title %}Contrat - {{ contract.contract_number }}{% endblock %}
+
+{% block content %}
+<div class="contract-container">
+    <!-- En-tête -->
+    <div class="text-center mb-4">
+        <h2 class="mb-2">{{ contract.tenant.name }}</h2>
+        <p class="mb-1">{{ contract.tenant.address or 'Adresse non renseignée' }}</p>
+        <p>Tel: {{ contract.tenant.phone or 'Non renseigné' }} | Email: {{ contract.tenant.email }}</p>
+        <hr>
+        <h3 class="mt-3">CONTRAT DE PRÊT N° {{ contract.contract_number }}</h3>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- PARTIE CLIENT (en haut) - À donner au client -->
+    <!-- ========================================== -->
+    <div class="contract-part client-part mb-4">
+        <div class="cut-line-top">
+            <h4 class="text-center bg-light p-2">📋 PARTIE CLIENT - À CONSERVER</h4>
+        </div>
+        <div class="p-3">
+            <p class="text-center"><strong>✂️ DÉCOUPEZ ICI ✂️</strong></p>
+            <p class="text-center"><small>Exemplaire à remettre à l'emprunteur</small></p>
+            
+            <h5>1. IDENTIFICATION DES PARTIES</h5>
+            <p><strong>Prêteur :</strong> {{ contract.tenant.name }}</p>
+            <p><strong>Emprunteur :</strong> {{ contract.client.full_name }}</p>
+            <p><strong>Né(e) le :</strong> {{ contract.client.date_of_birth.strftime('%d/%m/%Y') if contract.client.date_of_birth else 'Non renseigné' }}</p>
+            <p><strong>Profession :</strong> {{ contract.client.profession or 'Non renseignée' }}</p>
+            <p><strong>Adresse :</strong> {{ contract.client.address or 'Non renseignée' }}</p>
+            <p><strong>Téléphone :</strong> {{ contract.client.phone }}</p>
+            <p><strong>Pièce d'identité :</strong> {{ contract.client.national_id or 'Non renseignée' }}</p>
+            
+            <h5>2. CARACTÉRISTIQUES DU PRÊT</h5>
+            <table class="table table-bordered">
+                <tr><td>Montant emprunté</td><td><strong>{{ "{:,.0f}".format(contract.principal) }} FCFA</strong></td></tr>
+                <tr><td>Type d'intérêt</td><td>{{ "Composé" if contract.interest_type == 'compound' else "Simple" }}</td></tr>
+                <tr><td>Taux d'intérêt</td><td>{{ contract.interest_rate }}% l'an</td></tr>
+                <tr><td>Durée</td><td>{{ ((contract.end_date - contract.start_date).days // 30) }} mois</td></tr>
+                <tr><td>Montant des intérêts</td><td>{{ "{:,.0f}".format(contract.total_interest) }} FCFA</td></tr>
+                <tr><td>Montant total à rembourser</td><td><strong>{{ "{:,.0f}".format(contract.total_amount) }} FCFA</strong></td></tr>
+                <tr><td>Mensualité</td><td><strong>{{ "{:,.0f}".format(contract.monthly_payment) }} FCFA</strong></td></tr>
+            </table>
+            
+            <h5>3. ÉCHÉANCIER (6 premières échéances)</h5>
+            <table class="table table-sm">
+                <thead>
+                    <tr><th>N°</th><th>Date</th><th>Montant</th></tr>
+                </thead>
+                <tbody>
+                    {% for repayment in repayments[:6] %}
+                    <tr>
+                        <td>{{ loop.index }}</a></td>
+                        <td>{{ repayment.due_date.strftime('%d/%m/%Y') }}</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                        <td>{{ "{:,.0f}".format(repayment.due_amount) }} FCFA</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                    </tr>
+                    {% endfor %}
+                    {% if repayments|length > 6 %}
+                    <tr><td colspan="3" class="text-center">... et {{ repayments|length - 6 }} autres échéances</a></td>
+                    {% endif %}
+                </tbody>
+            </table>
+            
+            <h5>4. CONDITIONS GÉNÉRALES</h5>
+            <p>L'emprunteur s'engage à rembourser le prêt selon l'échéancier ci-dessus. Tout retard de paiement entraînera des pénalités conformément au règlement intérieur.</p>
+            <p>En cas de litige, les parties s'engagent à trouver une solution à l'amiable avant toute procédure judiciaire.</p>
+            
+            <div class="signature-box mt-4">
+                <div class="row">
+                    <div class="col-6">
+                        <hr>
+                        <p class="text-center"><small>Signature de l'emprunteur</small></p>
+                    </div>
+                    <div class="col-6">
+                        <hr>
+                        <p class="text-center"><small>Signature du prêteur</small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =================================================== -->
+    <!-- LIGNE DE COUPURE HORIZONTALE (pour découper) -->
+    <!-- =================================================== -->
+    <div class="cut-line-horizontal text-center my-3">
+        <hr style="border: 2px dashed #000; margin: 5px 0;">
+        <div class="bg-white px-3" style="display: inline-block; margin-top: -12px;">
+            ✂️ ✂️ ✂️ COUPEZ ICI ✂️ ✂️ ✂️
+        </div>
+        <hr style="border: 2px dashed #000; margin: 5px 0;">
+    </div>
+
+    <!-- =================================================== -->
+    <!-- PARTIE MICROFINANCE (en bas) - À conserver -->
+    <!-- =================================================== -->
+    <div class="contract-part microfinance-part mt-4">
+        <h4 class="text-center bg-light p-2">🏦 PARTIE MICROFINANCE - À CONSERVER</h4>
+        <div class="p-3">
+            <p class="text-center"><strong>Exemplaire à conserver par l'institution</strong></p>
+            
+            <h5>1. IDENTIFICATION</h5>
+            <p><strong>Prêteur :</strong> {{ contract.tenant.name }}</p>
+            <p><strong>Emprunteur :</strong> {{ contract.client.full_name }}</p>
+            <p><strong>Date du contrat :</strong> {{ contract.created_at.strftime('%d/%m/%Y') }}</p>
+            
+            <h5>2. DÉTAILS DU PRÊT</h5>
+            <table class="table table-bordered">
+                <tr><td>Capital</td><td>{{ "{:,.0f}".format(contract.principal) }} FCFA</td></tr>
+                <tr><td>Intérêts</td><td>{{ "{:,.0f}".format(contract.total_interest) }} FCFA</td></tr>
+                <tr><td>Total dû</td><td>{{ "{:,.0f}".format(contract.total_amount) }} FCFA</td></tr>
+            </table>
+            
+            <h5>3. ÉCHÉANCIER COMPLET</h5>
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>N°</th>
+                        <th>Date</th>
+                        <th>Principal</th>
+                        <th>Intérêts</th>
+                        <th>Total</th>
+                        <th>Reste dû</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in amortization_schedule %}
+                    <tr>
+                        <td>{{ payment.month }}</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                        <td>{{ payment.due_date.strftime('%d/%m/%Y') }}</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                        <td>{{ "{:,.0f}".format(payment.principal) }}</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                        <td>{{ "{:,.0f}".format(payment.interest) }}</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                        <td>{{ "{:,.0f}".format(payment.payment) }}</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                        <td>{{ "{:,.0f}".format(payment.remaining) }}</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                    </a>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr class="fw-bold">
+                        <td colspan="2">TOTAUX</td>
+                        <td>{{ "{:,.0f}".format(contract.principal) }}</td>
+                        <td>{{ "{:,.0f}".format(contract.total_interest) }}</td>
+                        <td>{{ "{:,.0f}".format(contract.total_amount) }}</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+            
+            <h5>4. SUIVI DES REMBOURSEMENTS</h5>
+            <table class="table table-sm">
+                <thead>
+                    <tr><th>Date</th><th>Montant</th><th>Reçu par</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td></td><td></td><td></td></tr>
+                    <tr><td></td><td></td><td></td></tr>
+                    <tr><td></td><td></td><td></td></tr>
+                    <tr><td></td><td></td><td></td></tr>
+                </tbody>
+            </table>
+            
+            <div class="signature-box mt-4">
+                <div class="row">
+                    <div class="col-6">
+                        <hr>
+                        <p class="text-center"><small>Signature de l'emprunteur</small></p>
+                    </div>
+                    <div class="col-6">
+                        <hr>
+                        <p class="text-center"><small>Cachet et signature de l'institution</small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pied de page -->
+    <div class="footer text-center mt-4 pt-3 border-top">
+        <small>Document généré le {{ now.strftime('%d/%m/%Y') }} - Tous droits réservés {{ contract.tenant.name }}</small>
+    </div>
+</div>
+
+<style>
+    @media print {
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        .contract-container {
+            width: 100%;
+            padding: 15px;
+        }
+        .btn-print, .btn-back {
+            display: none;
+        }
+        .contract-part {
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+        .bg-light {
+            background-color: #f0f0f0 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .cut-line-horizontal {
+            margin: 20px 0;
+        }
+        .cut-line-horizontal hr {
+            border: 2px dashed #000 !important;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #000;
+        }
+    }
+    
+    .contract-container {
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+    }
+    
+    .contract-part {
+        border: 1px solid #ddd;
+        background: white;
+        border-radius: 5px;
+    }
+    
+    .signature-box hr {
+        margin: 30px 0 5px 0;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+    }
+    
+    table th, table td {
+        border: 1px solid #ddd;
+        padding: 5px;
+        text-align: center;
+    }
+    
+    table th {
+        background-color: #f8f8f8;
+        font-weight: bold;
+    }
+    
+    h4 {
+        background-color: #f0f0f0;
+        padding: 10px;
+        margin: 0 0 15px 0;
+        border-radius: 5px 5px 0 0;
+    }
+    
+    h5 {
+        margin-top: 15px;
+        margin-bottom: 10px;
+        font-size: 13px;
+        font-weight: bold;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 5px;
+    }
+    
+    .cut-line-horizontal {
+        text-align: center;
+        position: relative;
+    }
+    
+    .cut-line-horizontal div {
+        position: relative;
+        z-index: 1;
+    }
+</style>
+{% endblock %}

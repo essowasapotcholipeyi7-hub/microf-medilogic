@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Détail demande{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">📄 Détail de la demande</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>Client :</strong>
+                            <p>{{ request.client.full_name }}</p>
+                        </div>
+                        <div class="col-6">
+                            <strong>Genre :</strong>
+                            <p>{% if request.client.gender == 'male' %}♂ Homme{% else %}♀ Femme{% endif %}</p>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>Montant demandé :</strong>
+                            <p>{{ "{:,.0f}".format(request.amount_requested) }} FCFA</p>
+                        </div>
+                        <div class="col-6">
+                            <strong>Durée :</strong>
+                            <p>{{ request.duration_months }} mois</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <strong>Produit :</strong>
+                            <p>{{ request.product.name }} ({{ request.product.interest_rate }}% - {{ request.product.interest_type }})</p>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <strong>Objet du prêt :</strong>
+                            <p>{{ request.purpose or '-' }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <strong>Garants :</strong>
+                            <p>{{ request.guarantor_names or '-' }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <strong>Garantie :</strong>
+                            <p>{{ request.collateral_description or '-' }}</p>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>Statut :</strong>
+                            <p>
+                                {% if request.status == 'pending' %}
+                                    <span class="badge bg-warning">⏳ En attente</span>
+                                {% elif request.status == 'approved' %}
+                                    <span class="badge bg-success">✅ Approuvé</span>
+                                {% elif request.status == 'rejected' %}
+                                    <span class="badge bg-danger">❌ Rejeté</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-6">
+                            <strong>Date :</strong>
+                            <p>{{ request.created_at.strftime('%d/%m/%Y') }}</p>
+                        </div>
+                    </div>
+                    
+                    {% if request.rejection_reason %}
+                    <div class="alert alert-danger">
+                        <strong>Motif du rejet :</strong><br>
+                        {{ request.rejection_reason }}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <div class="btn-group w-100">
+                        <a href="{{ url_for('credit_requests.index') }}" class="btn btn-secondary">Retour</a>
+                        {% if request.status == 'pending' %}
+                            <a href="{{ url_for('credit_requests.approve', id=request.id) }}" class="btn btn-success">Approuver</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

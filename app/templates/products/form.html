@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">{{ title }}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.name.label(class="form-label") }}
+                            {{ form.name(class="form-control") }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.description.label(class="form-label") }}
+                            {{ form.description(class="form-control", rows=3) }}
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                {{ form.interest_rate.label(class="form-label") }}
+                                {{ form.interest_rate(class="form-control", placeholder="12") }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form.interest_type.label(class="form-label") }}
+                                <select name="interest_type" class="form-control">
+                                    <option value="compound" {% if form.interest_type.data == 'compound' %}selected{% endif %}>Intérêt composé</option>
+                                    <option value="simple" {% if form.interest_type.data == 'simple' %}selected{% endif %}>Intérêt simple</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form.compounding_frequency.label(class="form-label") }}
+                                <select name="compounding_frequency" class="form-control">
+                                    <option value="monthly" {% if form.compounding_frequency.data == 'monthly' %}selected{% endif %}>Mensuel</option>
+                                    <option value="weekly" {% if form.compounding_frequency.data == 'weekly' %}selected{% endif %}>Hebdomadaire</option>
+                                    <option value="daily" {% if form.compounding_frequency.data == 'daily' %}selected{% endif %}>Quotidien</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.min_duration_months.label(class="form-label") }}
+                                {{ form.min_duration_months(class="form-control", placeholder="1") }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.max_duration_months.label(class="form-label") }}
+                                {{ form.max_duration_months(class="form-control", placeholder="36") }}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.min_amount.label(class="form-label") }}
+                                {{ form.min_amount(class="form-control", placeholder="5000") }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.max_amount.label(class="form-label") }}
+                                {{ form.max_amount(class="form-control", placeholder="1000000") }}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                {{ form.processing_fee.label(class="form-label") }}
+                                {{ form.processing_fee(class="form-control", placeholder="0") }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form.late_penalty_rate.label(class="form-label") }}
+                                {{ form.late_penalty_rate(class="form-control", placeholder="5") }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form.grace_period_days.label(class="form-label") }}
+                                {{ form.grace_period_days(class="form-control", placeholder="0") }}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check">
+                                    {{ form.requires_guarantor(class="form-check-input") }}
+                                    {{ form.requires_guarantor.label(class="form-check-label") }}
+                                </div>
+                                {{ form.min_guarantors(class="form-control mt-2", placeholder="Nombre de garants") }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check">
+                                    {{ form.requires_collateral(class="form-check-input") }}
+                                    {{ form.requires_collateral.label(class="form-check-label") }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-primary") }}
+                            <a href="{{ url_for('products.index') }}" class="btn btn-secondary mt-2">Annuler</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

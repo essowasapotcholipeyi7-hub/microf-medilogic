@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Ajouter un jour férié{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">📅 Ajouter un jour férié</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Nom du jour férié</label>
+                            <input type="text" name="name" class="form-control" required placeholder="Ex: Nouvel An">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Type</label>
+                            <select name="holiday_type" id="holidayType" class="form-control" required>
+                                <option value="fixed">Fixe (même date chaque année)</option>
+                                <option value="movable">Mobile (Pâques, Ascension, etc.)</option>
+                            </select>
+                        </div>
+                        
+                        <div id="fixedDiv">
+                            <div class="mb-3">
+                                <label class="form-label">Date (MM-DD)</label>
+                                <input type="text" name="fixed_date" class="form-control" placeholder="Ex: 01-01 pour 1er janvier">
+                            </div>
+                        </div>
+                        
+                        <div id="movableDiv" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label">Règle mobile</label>
+                                <select name="movable_rule" class="form-control">
+                                    <option value="easter">Lundi de Pâques</option>
+                                    <option value="ascension">Ascension</option>
+                                    <option value="pentecost">Pentecôte</option>
+                                    <option value="pentecost_monday">Lundi de Pentecôte</option>
+                                    <option value="easter+1">Lendemain de Pâques</option>
+                                    <option value="easter+2">2 jours après Pâques</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Année spécifique (optionnel)</label>
+                                <input type="number" name="year" class="form-control" placeholder="Laisser vide pour toutes les années">
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Ajouter</button>
+                            <a href="{{ url_for('holidays.index') }}" class="btn btn-secondary">Annuler</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('holidayType').addEventListener('change', function() {
+        if (this.value === 'fixed') {
+            document.getElementById('fixedDiv').style.display = 'block';
+            document.getElementById('movableDiv').style.display = 'none';
+        } else {
+            document.getElementById('fixedDiv').style.display = 'none';
+            document.getElementById('movableDiv').style.display = 'block';
+        }
+    });
+</script>
+{% endblock %}

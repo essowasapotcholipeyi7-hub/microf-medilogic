@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion de caisse{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">💰 Gestion de caisse</h1>
+    
+    <div class="row">
+        <div class="col-md-6 offset-md-3 mb-4">
+            <div class="card shadow bg-success text-white">
+                <div class="card-body text-center">
+                    <h5>Solde actuel de la caisse</h5>
+                    <h2 class="display-4">{{ "{:,.0f}".format(balance) }} FCFA</h2>
+                    <small>La caisse est alimentée par :</small>
+                    <ul class="text-start mt-2">
+                        <li>📥 Dépôts d'épargne des clients</li>
+                        <li>💰 Remboursements de crédits</li>
+                        <li>📈 Intérêts perçus</li>
+                    </ul>
+                    <small>La caisse est débitée par :</small>
+                    <ul class="text-start">
+                        <li>📤 Déboursements de crédits</li>
+                        <li>💸 Paiement des intérêts aux épargnants</li>
+                        <li>🏧 Retraits d'épargne des clients</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card shadow mt-4">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">📜 Historique des transactions</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Montant</th>
+                            <th>Solde après</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in transactions %}
+                        <tr>
+                            <td>{{ t.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                            <td>
+                                {% if t.transaction_type == 'deposit' %}
+                                    <span class="badge bg-success">+ Dépôt</span>
+                                {% elif t.transaction_type == 'withdrawal' %}
+                                    <span class="badge bg-danger">- Retrait</span>
+                                {% else %}
+                                    <span class="badge bg-info">{{ t.transaction_type }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if t.transaction_type == 'withdrawal' %}
+                                    -{{ "{:,.0f}".format(t.amount) }} FCFA
+                                {% else %}
+                                    +{{ "{:,.0f}".format(t.amount) }} FCFA
+                                {% endif %}
+                            </td>
+                            <td>{{ "{:,.0f}".format(t.balance_after) }} FCFA</td>
+                            <td>{{ t.description or '-' }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center">Aucune transaction</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

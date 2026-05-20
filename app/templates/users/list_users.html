@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion des utilisateurs{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>👥 Gestion des utilisateurs</h1>
+        <a href="{{ url_for('users.add_agent') }}" class="btn btn-primary">
+            + Nouvel utilisateur
+        </a>
+    </div>
+    
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Téléphone</th>
+                            <th>Rôle</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr class="{% if user.id == current_user.id %}table-info{% endif %}">
+                            <td>{{ user.first_name }} {{ user.last_name }}
+                                {% if user.id == current_user.id %} <span class="badge bg-info">(Vous)</span>{% endif %}
+                            </a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                            <td>{{ user.email }}</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                            <td>{{ user.phone or '-' }}</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                            <td>
+                                {% if user.role == 'admin' %}
+                                    <span class="badge bg-danger">👑 Administrateur</span>
+                                {% else %}
+                                    <span class="badge bg-info">👨‍💼 Agent</span>
+                                {% endif %}
+                            </a>
+                            <td>
+                                {% if user.is_active %}
+                                    <span class="badge bg-success">Actif</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactif</span>
+                                {% endif %}
+                            </a>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    {% if user.id != current_user.id %}
+                                        <a href="{{ url_for('users.toggle_user', id=user.id) }}" class="btn btn-warning">
+                                            {% if user.is_active %}Désactiver{% else %}Activer{% endif %}
+                                        </a>
+                                        <a href="{{ url_for('users.delete_user', id=user.id) }}" class="btn btn-danger" onclick="return confirm('Supprimer cet utilisateur ?')">🗑️</a>
+                                    {% else %}
+                                        <span class="text-muted">Action sur vous-même impossible</span>
+                                    {% endif %}
+                                </div>
+                            </a>
+                        </a>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">Aucun utilisateur</a></td>
+                        </a>
+                        {% endfor %}
+                    </tbody>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

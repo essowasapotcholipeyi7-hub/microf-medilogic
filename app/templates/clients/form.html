@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">{{ title }}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.first_name.label(class="form-label") }}
+                                {{ form.first_name(class="form-control") }}
+                                {% for error in form.first_name.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.last_name.label(class="form-label") }}
+                                {{ form.last_name(class="form-control") }}
+                                {% for error in form.last_name.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.gender.label(class="form-label") }}
+                                <select name="gender" class="form-control">
+                                    <option value="">-- Sélectionner --</option>
+                                    <option value="male" {% if form.gender.data == 'male' %}selected{% endif %}>Homme</option>
+                                    <option value="female" {% if form.gender.data == 'female' %}selected{% endif %}>Femme</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.phone.label(class="form-label") }}
+                                {{ form.phone(class="form-control") }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Agent assigné</label>
+                            <select name="agent_id" class="form-control">
+                                <option value="">-- Aucun agent --</option>
+                                {% for agent in agents %}
+                                <option value="{{ agent.id }}" {% if client and client.agent_id == agent.id %}selected{% endif %}>
+                                    {{ agent.first_name }} {{ agent.last_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.email.label(class="form-label") }}
+                                {{ form.email(class="form-control") }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.national_id.label(class="form-label") }}
+                                {{ form.national_id(class="form-control") }}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.profession.label(class="form-label") }}
+                                {{ form.profession(class="form-control") }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.monthly_income.label(class="form-label") }}
+                                {{ form.monthly_income(class="form-control", placeholder="0") }}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.address.label(class="form-label") }}
+                            {{ form.address(class="form-control", rows=2) }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.city.label(class="form-label") }}
+                            {{ form.city(class="form-control") }}
+                        </div>
+                        
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-primary") }}
+                            <a href="{{ url_for('clients.index') }}" class="btn btn-secondary mt-2">Annuler</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Approuver la demande{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">✓ Approuver / Rejeter</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <strong>Client :</strong> {{ request.client.full_name }}<br>
+                        <strong>Montant :</strong> {{ "{:,.0f}".format(request.amount_requested) }} FCFA<br>
+                        <strong>Durée :</strong> {{ request.duration_months }} mois
+                    </div>
+                    
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3 form-check">
+                            {{ form.approve(class="form-check-input") }}
+                            {{ form.approve.label(class="form-check-label text-success fw-bold") }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.rejection_reason.label(class="form-label") }}
+                            {{ form.rejection_reason(class="form-control", rows=3, placeholder="Si rejet, indiquez le motif...") }}
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            {{ form.submit(class="btn btn-success") }}
+                            <a href="{{ url_for('credit_requests.view', id=request.id) }}" class="btn btn-secondary">Annuler</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

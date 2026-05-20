@@ -1,0 +1,581 @@
+{% extends "base.html" %}
+
+{% block title %}Tableau de bord - Microfinance{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-3">
+    <!-- Bouton retour en haut (flottant) moderne -->
+    <button onclick="window.scrollTo({top: 0, behavior: 'smooth'});" 
+            id="backToTop"
+            class="btn-back-top"
+            style="position: fixed; bottom: 30px; right: 30px; z-index: 1000; 
+                   background: linear-gradient(135deg, #667eea, #764ba2);
+                   color: white; border: none; 
+                   border-radius: 50%; width: 55px; height: 55px; font-size: 24px;
+                   cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                   transition: all 0.3s ease; opacity: 0; visibility: hidden;">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <style>
+        /* Styles additionnels modernes */
+        .btn-back-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .stat-card-modern {
+            border: none;
+            border-radius: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .stat-card-modern:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+        }
+        
+        .stat-card-modern .card-body {
+            padding: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .stat-card-modern .stat-icon {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            font-size: 3rem;
+            opacity: 0.15;
+            transition: all 0.3s;
+        }
+        
+        .stat-card-modern:hover .stat-icon {
+            opacity: 0.25;
+            transform: scale(1.1);
+        }
+        
+        .card-glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-quick {
+            border-radius: 12px;
+            padding: 0.75rem;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .btn-quick:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .welcome-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 20px;
+            color: white;
+        }
+        
+        .welcome-banner .alert-heading {
+            color: white;
+        }
+        
+        .table-modern {
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .table-modern thead {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .table-modern thead th {
+            border: none;
+            padding: 1rem;
+            font-weight: 600;
+        }
+        
+        .table-modern tbody tr {
+            transition: all 0.3s;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .table-modern tbody tr:hover {
+            background: #f8f9ff;
+            transform: scale(1.01);
+        }
+        
+        .badge-danger-custom {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-in {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+        
+        .stat-card-modern {
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .stat-card-modern:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card-modern:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card-modern:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card-modern:nth-child(4) { animation-delay: 0.4s; }
+    </style>
+
+<!-- Message de bienvenue personnalisé -->
+<div class="row">
+    <div class="col-12">
+        <div class="card bg-gradient-primary border-0 shadow-lg mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="card-body text-white p-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="display-6 fw-bold mb-2">
+                            👋 Bonjour, {{ user.first_name or user.username }} !
+                        </h2>
+                        <h4 class="mb-3">
+                            🏦 <strong>{{ user.tenant.name }}</strong>
+                        </h4>
+                        <div class="alert alert-light alert-dismissible fade show mb-0 mt-3" role="alert" style="background: rgba(255,255,255,0.2); border: none; color: white;">
+                            <div class="row align-items-center">
+                                <div class="col-md-10">
+                                    <span id="motivationMessage" style="font-size: 1.1rem;">
+                                        💫 "Chaque prêt accordé est une graine plantée pour un avenir meilleur..."
+                                    </span>
+                                </div>
+                                <div class="col-md-2 text-end">
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <i class="display-1">🎯</i>
+                        <p class="mt-2 small">Impact positif dans votre communauté</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Cartes statistiques modernisées -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card-modern bg-primary text-white">
+                <div class="card-body">
+                    <h6 class="text-uppercase mb-2 opacity-75">
+                        <i class="fas fa-users me-2"></i>Clients
+                    </h6>
+                    <p class="display-4 fw-bold mb-0">{{ total_clients }}</p>
+                </div>
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{{ url_for('clients.index') }}" class="text-white text-decoration-none opacity-75">
+                        Voir détails <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card-modern bg-success text-white">
+                <div class="card-body">
+                    <h6 class="text-uppercase mb-2 opacity-75">
+                        <i class="fas fa-hand-holding-usd me-2"></i>Crédits actifs
+                    </h6>
+                    <p class="display-4 fw-bold mb-0">{{ active_loans }}</p>
+                </div>
+                <div class="stat-icon">
+                    <i class="fas fa-hand-holding-usd"></i>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{{ url_for('contracts.index') }}" class="text-white text-decoration-none opacity-75">
+                        Voir détails <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card-modern bg-warning text-white">
+                <div class="card-body">
+                    <h6 class="text-uppercase mb-2 opacity-75">
+                        <i class="fas fa-clock me-2"></i>En attente
+                    </h6>
+                    <p class="display-4 fw-bold mb-0">{{ pending_requests }}</p>
+                </div>
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{{ url_for('credit_requests.index') }}" class="text-white text-decoration-none opacity-75">
+                        Voir détails <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card-modern bg-info text-white">
+                <div class="card-body">
+                    <h6 class="text-uppercase mb-2 opacity-75">
+                        <i class="fas fa-chart-line me-2"></i>Recouvrement
+                    </h6>
+                    <p class="display-4 fw-bold mb-0">{{ "%.1f"|format(recovery_rate) }}%</p>
+                </div>
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{{ url_for('reports.index') }}" class="text-white text-decoration-none opacity-75">
+                        Voir détails <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphique avec conseil intelligent -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow card-glass animate-in" style="animation-delay: 0.5s;">
+                <div class="card-header bg-gradient-primary text-white" style="background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 20px 20px 0 0;">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line me-2"></i>Évolution des crédits et de la caisse (FCFA)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="loansChart" height="100"></canvas>
+                    <div class="alert alert-modern mt-3" style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: none; border-radius: 15px;">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-lightbulb fa-2x text-warning"></i>
+                            </div>
+                            <div>
+                                <strong class="text-dark">💡 Conseil personnalisé :</strong>
+                                <span id="adviceMessage" class="text-dark">Chargement...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alertes de retard WhatsApp modernisées -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow animate-in" style="animation-delay: 0.6s;">
+                <div class="card-header" style="background: linear-gradient(135deg, #ef4444, #dc2626); border-radius: 20px 20px 0 0;">
+                    <h5 class="mb-0 text-white">
+                        <i class="fas fa-bell me-2"></i>⚠️ Clients en retard de paiement (≥ 7 jours)
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if late_repayments %}
+                    <div class="table-responsive">
+                        <table class="table table-modern mb-0">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-user me-1"></i>Client</th>
+                                    <th><i class="fas fa-file-contract me-1"></i>Contrat</th>
+                                    <th><i class="fas fa-money-bill me-1"></i>Montant dû</th>
+                                    <th><i class="fas fa-hourglass-half me-1"></i>Retard</th>
+                                    <th><i class="fas fa-comment me-1"></i>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for late in late_repayments %}
+                                <tr style="background: linear-gradient(90deg, #fef2f2, #fee2e2);">
+                                    <td class="fw-bold">👤 {{ late.client_name }}</td>
+                                    <td>📄 {{ late.contract_number }}</td>
+                                    <td class="text-danger fw-bold">{{ "{:,.0f}".format(late.amount_due) }} FCFA</td>
+                                    <td><span class="badge-danger-custom">🔴 {{ late.days_late }} jours</span></td>
+                                    <td>
+                                        <a href="{{ late.whatsapp_link }}" target="_blank" class="btn btn-success btn-sm">
+                                            <i class="fab fa-whatsapp me-1"></i> Envoyer rappel
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <h5 class="text-success">Aucun client en retard</h5>
+                        <p class="text-muted">Tous les paiements sont à jour</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Navigation rapide modernisée -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow animate-in" style="animation-delay: 0.7s;">
+            <div class="card-header" style="background: linear-gradient(135deg, #3b82f6, #2563eb); border-radius: 20px 20px 0 0;">
+                <h5 class="mb-0 text-white">
+                    <i class="fas fa-rocket me-2"></i>Navigation rapide
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-2">
+                    <div class="col-md-3 col-6">
+                        <a href="{{ url_for('clients.index') }}" class="btn btn-outline-primary btn-quick w-100">
+                            <i class="fas fa-users me-2"></i>Clients
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <a href="{{ url_for('clients.add') }}" class="btn btn-outline-success btn-quick w-100">
+                            <i class="fas fa-user-plus me-2"></i>Ajouter client
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <a href="{{ url_for('credit_requests.new') }}" class="btn btn-outline-info btn-quick w-100">
+                            <i class="fas fa-file-alt me-2"></i>Demande crédit
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <a href="{{ url_for('contracts.index') }}" class="btn btn-outline-warning btn-quick w-100">
+                            <i class="fas fa-file-signature me-2"></i>Contrats
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <a href="{{ url_for('savings.index') }}" class="btn btn-outline-info btn-quick w-100">
+                            <i class="fas fa-piggy-bank me-2"></i>Épargne
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <a href="{{ url_for('groups.index') }}" class="btn btn-outline-success btn-quick w-100">
+                            <i class="fas fa-layer-group me-2"></i>Groupes
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <a href="{{ url_for('products.index') }}" class="btn btn-outline-secondary btn-quick w-100">
+                            <i class="fas fa-boxes me-2"></i>Produits
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <a href="{{ url_for('users.list_users') }}" class="btn btn-outline-primary btn-quick w-100">
+                            <i class="fas fa-users-cog me-2"></i>Utilisateurs
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <a href="{{ url_for('reports.index') }}" class="btn btn-outline-secondary btn-quick w-100">
+                            <i class="fas fa-chart-bar me-2"></i>Rapports
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <a href="{{ url_for('cash.index') }}" class="btn btn-outline-info btn-quick w-100">
+                            <i class="fas fa-money-bill-wave me-2"></i>Caisse
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <a href="{{ url_for('holidays.index') }}" class="btn btn-outline-info btn-quick w-100">
+                            <i class="fas fa-calendar-alt me-2"></i>Jours fériés
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <a href="{{ url_for('users.agents') }}" class="btn btn-outline-primary btn-quick w-100">
+                            <i class="fas fa-user-tie me-2"></i>Agents
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger btn-quick w-100">
+                            <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <a href="#" class="btn btn-outline-dark btn-quick w-100" onclick="window.print()">
+                            <i class="fas fa-print me-2"></i>Imprimer
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Gestion du bouton retour en haut
+    window.addEventListener('scroll', function() {
+        const btn = document.getElementById('backToTop');
+        if (window.scrollY > 300) {
+            btn.style.opacity = '1';
+            btn.style.visibility = 'visible';
+        } else {
+            btn.style.opacity = '0';
+            btn.style.visibility = 'hidden';
+        }
+    });
+
+    // Graphique avec deux courbes
+    const ctx1 = document.getElementById('loansChart').getContext('2d');
+    const chart = new Chart(ctx1, {
+        type: 'line',
+        data: {
+            labels: {{ loan_labels|tojson }},
+            datasets: [
+                {
+                    label: '💰 Crédits déboursés (FCFA)',
+                    data: {{ loan_data|tojson }},
+                    borderColor: 'rgb(54, 162, 235)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                },
+                {
+                    label: '🏦 Solde caisse (FCFA)',
+                    data: {{ cash_data|tojson }},
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        boxWidth: 10
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    titleColor: 'white',
+                    bodyColor: 'white',
+                    borderColor: '#667eea',
+                    borderWidth: 2,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            let value = context.raw;
+                            return label + ': ' + value.toLocaleString() + ' FCFA';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0,0,0,0.05)'
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString() + ' FCFA';
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+
+    // Message de conseil basé sur les données
+    const loanData = {{ loan_data|tojson }};
+    const cashData = {{ cash_data|tojson }};
+    const lastLoan = loanData[loanData.length - 1] || 0;
+    const lastCash = cashData[cashData.length - 1] || 0;
+    
+    let advice = "";
+    let adviceIcon = "";
+    let adviceClass = "";
+    
+    if (lastCash > lastLoan * 2) {
+        advice = "✅ Situation excellente ! La caisse est très bien approvisionnée. Vous pouvez accorder de nouveaux prêts en toute confiance.";
+        adviceIcon = "🎉";
+    } else if (lastCash > lastLoan) {
+        advice = "👍 Situation bonne. La caisse couvre confortablement les prêts. Vous pouvez continuer à accorder des prêts modérés.";
+        adviceIcon = "📈";
+    } else if (lastCash > lastLoan * 0.5) {
+        advice = "⚠️ Attention : votre caisse diminue. Privilégiez le recouvrement des créances avant d'accorder de nouveaux prêts.";
+        adviceIcon = "⚡";
+    } else {
+        advice = "🔴 Urgence ! La caisse est très basse. Concentrez-vous sur les remboursements et réduisez les nouveaux crédits temporairement.";
+        adviceIcon = "🚨";
+    }
+    
+    document.getElementById('adviceMessage').innerHTML = `${adviceIcon} ${advice}`;
+
+    // Messages de motivation aléatoires
+    const motivationMessages = [
+        "💪 Ensemble, construisons un avenir financier solide pour notre communauté !",
+        "🌟 Chaque crédit approuvé est une opportunité de transformation.",
+        "🤝 La microfinance, c'est donner une chance à ceux qui en ont besoin.",
+        "📈 Votre impact aujourd'hui façonne l'économie de demain.",
+        "🎯 Faites la différence, un prêt à la fois.",
+        "💡 L'inclusion financière commence avec vous !",
+        "🏆 Vous êtes le pont entre les rêves et la réalité de vos clients.",
+        "🌱 Semez la prospérité aujourd'hui, récoltez la croissance demain.",
+        "🤲 La confiance que vous accordez à vos clients est un investissement dans l'avenir.",
+        "💎 Chaque client qui réussit est une victoire pour toute la communauté.",
+        "⭐ Vous ne gérez pas seulement de l'argent, vous gérez des espoirs.",
+        "🚀 Ensemble, allons plus loin dans l'inclusion financière !"
+    ];
+    
+    // Changer le message toutes les 10 secondes
+    let index = 0;
+    setInterval(function() {
+        const msgElement = document.getElementById('motivationMessage');
+        if (msgElement) {
+            msgElement.style.opacity = '0';
+            setTimeout(function() {
+                msgElement.innerHTML = motivationMessages[index % motivationMessages.length];
+                msgElement.style.opacity = '1';
+                index++;
+            }, 300);
+        }
+    }, 10000);
+</script>
+{% endblock %}

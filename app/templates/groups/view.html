@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}{{ group.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">👥 {{ group.name }}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Description :</strong> {{ group.description or 'Aucune' }}</p>
+                            <p><strong>Responsable :</strong> {{ group.leader.full_name if group.leader else 'Non défini' }}</p>
+                            <p><strong>Date création :</strong> {{ group.created_at.strftime('%d/%m/%Y') }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="alert alert-info">
+                                <strong>📊 Statistiques du groupe</strong><br>
+                                👥 Membres: {{ group.member_count }}<br>
+                                💰 Total crédits: {{ "{:,.0f}".format(total_loans) }} FCFA<br>
+                                ✅ Taux remboursement: {{ "%.1f"|format(recovery_rate) }}%
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h4>👥 Membres du groupe</h4>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Contact</th>
+                                    <th>Rôle</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for member in group.members %}
+                                <tr>
+                                    <td>{{ member.client.full_name }}</td>
+                                    <td>{{ member.client.phone }}</td>
+                                    <td>{{ member.role }}</td>
+                                    <td>
+                                        <a href="{{ url_for('groups.remove_member', member_id=member.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Retirer ce membre ?')">
+                                            Retirer
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h4>➕ Ajouter un membre</h4>
+                    <form method="POST" action="{{ url_for('groups.add_member', group_id=group.id) }}" class="row g-3">
+                        <div class="col-md-6">
+                            <select name="client_id" class="form-control" required>
+                                <option value="">-- Sélectionner un client --</option>
+                                {% for client in group.tenant.clients %}
+                                    {% if client not in group.members|map(attribute='client') %}
+                                    <option value="{{ client.id }}">{{ client.full_name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select name="role" class="form-control">
+                                <option value="member">Membre</option>
+                                <option value="secretary">Secrétaire</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary w-100">Ajouter</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer">
+                    <div class="btn-group w-100">
+                        <a href="{{ url_for('groups.index') }}" class="btn btn-secondary">← Retour</a>
+                        <a href="{{ url_for('groups.group_loan', group_id=group.id) }}" class="btn btn-success">💰 Prêt solidaire</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

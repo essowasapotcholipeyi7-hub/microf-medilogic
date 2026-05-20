@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Comptes d'épargne{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">🏦 Comptes d'épargne</h1>
+    
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <h5>Nombre de comptes</h5>
+                    <h2>{{ total_accounts }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h5>Total épargne</h5>
+                    <h2>{{ "{:,.0f}".format(total_balance) }} FCFA</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                    <h5>Intérêts versés</h5>
+                    <h2>{{ "{:,.0f}".format(total_interest) }} FCFA</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">📋 Liste des comptes d'épargne</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Client</th>
+                            <th>N° Compte</th>
+                            <th>Solde</th>
+                            <th>Taux (%)</th>
+                            <th>Intérêts gagnés</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for account in accounts %}
+                        <tr>
+                            <td>{{ account.client.full_name }} ({%
+                                if account.client.gender == 'male' %}♂{% else %}♀{% endif %})
+                            </td>
+                            <td>{{ account.account_number }}</td>
+                            <td>{{ "{:,.0f}".format(account.balance) }} FCFA</td>
+                            <td>{{ account.interest_rate }}%</td>
+                            <td>{{ "{:,.0f}".format(account.total_interest_earned) }} FCFA</td>
+                            <td>
+                                <a href="{{ url_for('savings.client_account', client_id=account.client.id) }}" class="btn btn-sm btn-info">Gérer</a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">Aucun compte d'épargne</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

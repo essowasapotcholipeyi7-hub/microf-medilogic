@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Performance des agents{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">👨‍💼 Performance des agents</h1>
+    
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Agent</th>
+                            <th>Clients</th>
+                            <th>Crédits déboursés</th>
+                            <th>Montant recouvré</th>
+                            <th>Taux recouvrement</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for data in agents_data %}
+                        <tr>
+                            <td>{{ data.agent.full_name or data.agent.username }}</td>
+                            <td>{{ data.clients_count }}</td>
+                            <td>{{ "{:,.0f}".format(data.total_disbursed) }} FCFA</td>
+                            <td>{{ "{:,.0f}".format(data.total_recovered) }} FCFA</td>
+                            <td>
+                                <div class="progress" style="width: 100px; display: inline-block;">
+                                    <div class="progress-bar bg-success" style="width: {{ data.recovery_rate }}%">
+                                        {{ "%.1f"|format(data.recovery_rate) }}%
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-info">Détails</a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">Aucun agent enregistré</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <a href="{{ url_for('reports.index') }}" class="btn btn-secondary">← Retour</a>
+    </div>
+</div>
+{% endblock %}

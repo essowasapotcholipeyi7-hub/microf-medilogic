@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Prévisualisation {{ year }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-info text-white">
+            <h3 class="mb-0">📅 Jours fériés en {{ year }}</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Date</th>
+                            <th>Jour de semaine</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for holiday in holidays %}
+                        <tr class="table-warning">
+                            <td>{{ holiday.name }}</td>
+                            <td>{{ holiday.date.strftime('%d/%m/%Y') }}</td>
+                            <td>
+                                {% set weekdays = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'] %}
+                                {{ weekdays[holiday.date.weekday()] }}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" class="text-center">Aucun jour férié enregistré pour cette année</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-3">
+                <a href="{{ url_for('holidays.index') }}" class="btn btn-secondary">← Retour</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

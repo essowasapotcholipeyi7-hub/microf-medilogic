@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Contrats de prêt{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>📄 Contrats de prêt</h1>
+    </div>
+    
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>N° Contrat</th>
+                            <th>Client</th>
+                            <th>Montant</th>
+                            <th>Total à rembourser</th>
+                            <th>Mensualité</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for contract in contracts %}
+                        <tr>
+                            <td>{{ contract.contract_number }}</td>
+                            <td>{{ contract.client.full_name }}</td>
+                            <td>{{ "{:,.0f}".format(contract.principal) }} FCFA</td>
+                            <td>{{ "{:,.0f}".format(contract.total_amount) }} FCFA</td>
+                            <td>{{ "{:,.0f}".format(contract.monthly_payment) }} FCFA</td>
+                            <td>
+                                {% if contract.status == 'active' %}
+                                    <span class="badge bg-success">Actif</span>
+                                {% elif contract.status == 'completed' %}
+                                    <span class="badge bg-info">Terminé</span>
+                                {% else %}
+                                    <span class="badge bg-danger">{{ contract.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('contracts.view', id=contract.id) }}" class="btn btn-sm btn-info">Voir</a>
+                                <a href="{{ url_for('contracts.generate_schedule', contract_id=contract.id) }}" class="btn btn-sm btn-secondary">Échéancier</a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center">Aucun contrat</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

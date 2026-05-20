@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Créer un contrat{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">💰 Confirmation du déboursement</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Informations client</h5>
+                            <p>
+                                <strong>Nom :</strong> {{ client.full_name }}<br>
+                                <strong>Genre :</strong> {% if client.gender == 'male' %}Homme{% else %}Femme{% endif %}<br>
+                                <strong>Téléphone :</strong> {{ client.phone }}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Informations prêt</h5>
+                            <p>
+                                <strong>Produit :</strong> {{ product.name }}<br>
+                                <strong>Taux :</strong> {{ product.interest_rate }}% ({{ product.interest_type }})<br>
+                                <strong>Durée :</strong> {{ credit_request.duration_months }} mois
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="alert alert-info text-center">
+                                <h5>Montant demandé</h5>
+                                <h3>{{ "{:,.0f}".format(credit_request.amount_requested) }} FCFA</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="alert alert-warning text-center">
+                                <h5>Intérêts totaux</h5>
+                                <h3>{{ "{:,.0f}".format(interest_result.total_interest) }} FCFA</h3>
+                                <small>({{ interest_result.effective_rate }}% effectif)</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="alert alert-success text-center">
+                                <h5>Total à rembourser</h5>
+                                <h3>{{ "{:,.0f}".format(interest_result.total_amount) }} FCFA</h3>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-secondary">
+                        <h5>📅 Mensualité : {{ "{:,.0f}".format(amortization.monthly_payment) }} FCFA</h5>
+                        <small>Premier paiement dans 30 jours</small>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h5>Échéancier prévisionnel</h5>
+                    <div class="table-responsive" style="max-height: 300px;">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Mois</th>
+                                    <th>Date échéance</th>
+                                    <th>Mensualité</th>
+                                    <th>Principal</th>
+                                    <th>Intérêts</th>
+                                    <th>Reste dû</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in amortization.schedule[:12] %}
+                                <tr>
+                                    <td>{{ payment.month }}</td>
+                                    <td>{{ payment.due_date.strftime('%d/%m/%Y') }}</td>
+                                    <td>{{ "{:,.0f}".format(payment.payment) }} FCFA</td>
+                                    <td>{{ "{:,.0f}".format(payment.principal) }} FCFA</td>
+                                    <td>{{ "{:,.0f}".format(payment.interest) }} FCFA</td>
+                                    <td>{{ "{:,.0f}".format(payment.remaining) }} FCFA</td>
+                                </tr>
+                                {% endfor %}
+                                {% if amortization.schedule|length > 12 %}
+                                <tr>
+                                    <td colspan="6" class="text-center">... et {{ amortization.schedule|length - 12 }} autres mensualités</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="alert alert-primary">
+                        <strong>📝 Numéro de contrat :</strong> {{ contract_number }}
+                    </div>
+                    
+                    <form method="POST">
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success btn-lg flex-grow-1">
+                                ✅ Confirmer le déboursement
+                            </button>
+                            <a href="{{ url_for('credit_requests.index') }}" class="btn btn-secondary btn-lg">
+                                Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Clients{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>👥 Clients</h1>
+        <a href="{{ url_for('clients.add') }}" class="btn btn-primary">
+            + Nouveau client
+        </a>
+    </div>
+    
+    <!-- Statistiques -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <h5>Total clients</h5>
+                    <h2>{{ total_clients }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h5>👨 Hommes</h5>
+                    <h2>{{ male_count }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                    <h5>👩 Femmes</h5>
+                    <h2>{{ female_count }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Barre de recherche -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text">🔍</span>
+                        <input type="text" name="search" class="form-control" 
+                               placeholder="Rechercher par nom, téléphone, CNI..." 
+                               value="{{ search }}">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select name="gender" class="form-control">
+                        <option value="">Tous les genres</option>
+                        <option value="male" {% if gender_filter == 'male' %}selected{% endif %}>👨 Hommes</option>
+                        <option value="female" {% if gender_filter == 'female' %}selected{% endif %}>👩 Femmes</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i> Rechercher
+                    </button>
+                </div>
+            </form>
+            {% if search or gender_filter %}
+            <div class="mt-2">
+                <a href="{{ url_for('clients.index') }}" class="btn btn-sm btn-secondary">
+                    🗑️ Effacer les filtres
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Liste des clients -->
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nom complet</th>
+                            <th>Genre</th>
+                            <th>Téléphone</th>
+                            <th>Profession</th>
+                            <th>Revenu mensuel</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for client in clients %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('clients.edit', id=client.id) }}">{{ client.full_name }}</a>
+                            </td>
+                            <td>
+                                {% if client.gender == 'male' %}👨 Homme
+                                {% elif client.gender == 'female' %}👩 Femme
+                                {% else %}{{ client.gender }}{% endif %}
+                            </td>
+                            <td>{{ client.phone }}</td>
+                            <td>{{ client.profession or '-' }}</td>
+                            <td>{{ "{:,.0f}".format(client.monthly_income) if client.monthly_income else '-' }} FCFA</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('clients.edit', id=client.id) }}" class="btn btn-warning">✏️</a>
+                                    <a href="{{ url_for('savings.client_account', client_id=client.id) }}" class="btn btn-info">🏦</a>
+                                    <a href="{{ url_for('clients.delete', id=client.id) }}" class="btn btn-danger" onclick="return confirm('Supprimer ce client ?')">🗑️</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">
+                                {% if search or gender_filter %}
+                                    Aucun client ne correspond à votre recherche
+                                {% else %}
+                                    Aucun client enregistré
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

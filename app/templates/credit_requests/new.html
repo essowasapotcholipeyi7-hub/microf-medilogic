@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Nouvelle demande de crédit{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Nouvelle demande de credit</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Client</label>
+                            <select name="client_id" class="form-control" required>
+                                <option value="">-- Selectionner un client --</option>
+                                {% for client in clients %}
+                                <option value="{{ client.id }}">{{ client.full_name }} ({{ client.gender }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Produit de pret</label>
+                            <select name="product_id" class="form-control" required>
+                                <option value="">-- Selectionner un produit --</option>
+                                {% for product in products %}
+                                <option value="{{ product.id }}">
+                                    {{ product.name }} - {{ product.interest_rate }}% 
+                                    ({{ product.min_amount }} - {{ product.max_amount }} FCFA)
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div id="clientSummary" class="alert alert-info mt-3" style="display: none;">
+                            <h5>📊 Situation du client</h5>
+                            <div id="clientSummaryContent"></div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.amount_requested.label(class="form-label") }}
+                                {{ form.amount_requested(class="form-control", placeholder="Ex: 100000") }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.duration_months.label(class="form-label") }}
+                                {{ form.duration_months(class="form-control", placeholder="Mois") }}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.purpose.label(class="form-label") }}
+                            {{ form.purpose(class="form-control", rows=3, placeholder="Objet du pret...") }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.guarantor_names.label(class="form-label") }}
+                            {{ form.guarantor_names(class="form-control", placeholder="Nom1, Nom2, Nom3") }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.collateral_description.label(class="form-label") }}
+                            {{ form.collateral_description(class="form-control", rows=2, placeholder="Description de la garantie...") }}
+                        </div>
+                        
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-primary") }}
+                            <a href="{{ url_for('credit_requests.index') }}" class="btn btn-secondary mt-2">Annuler</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Charger les infos du client quand sélectionné
+    document.querySelector('select[name="client_id"]').addEventListener('change', function() {
+        var clientId = this.value;
+        if (clientId) {
+            fetch('/api/client-summary/' + clientId)
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        document.getElementById('clientSummary').style.display = 'block';
+                        document.getElementById('clientSummaryContent').innerHTML = `
+                            <p>💰 Revenu mensuel: ${data.monthly_income.toLocaleString()} FCFA</p>
+                            <p>🏦 Épargne disponible: ${data.savings_balance.toLocaleString()} FCFA</p>
+                            <p>📊 Crédits actifs: ${data.active_loans_count}</p>
+                            <p>✅ Capacité d'emprunt max: ${data.max_loan_amount.toLocaleString()} FCFA</p>
+                        `;
+                    }
+                });
+        }
+    });
+</script>
+{% endblock %}
