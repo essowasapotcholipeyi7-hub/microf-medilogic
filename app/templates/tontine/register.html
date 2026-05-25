@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Inscription a la tontine{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">💰 Inscription a la tontine</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <strong>Client :</strong> {{ client.full_name }}<br>
+                        <strong>Telephone :</strong> {{ client.phone }}
+                    </div>
+                    
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Montant quotidien (FCFA)</label>
+                            <input type="number" name="daily_amount" class="form-control" value="500" required min="500" step="500">
+                            <small class="text-muted">Minimum 500 FCFA par jour</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Date de debut</label>
+                            <input type="date" name="start_date" class="form-control" value="2024-01-01" required>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <strong>Regles de la tontine :</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Versement quotidien obligatoire</li>
+                                <li>Possibilite de payer plusieurs jours a la fois</li>
+                                <li>Retrait possible apres 60 jours de versement</li>
+                                <li>Interets de 5% par an sur l'epargne</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Inscrire a la tontine</button>
+                            <a href="{{ url_for('tontine.index') }}" class="btn btn-secondary">Annuler</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

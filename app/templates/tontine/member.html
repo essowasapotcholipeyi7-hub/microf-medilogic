@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Tontine - {{ member.client.full_name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">💰 Tontine - {{ member.client.full_name }}</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Resume -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="alert alert-info text-center">
+                                <small>Montant quotidien</small>
+                                <h4>{{ "{:,.0f}".format(member.daily_amount) }} FCFA</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="alert alert-success text-center">
+                                <small>Total epargne</small>
+                                <h4>{{ "{:,.0f}".format(member.total_paid) }} FCFA</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="alert alert-warning text-center">
+                                <small>Interets gagnes</small>
+                                <h4>{{ "{:,.0f}".format(member.interest_earned) }} FCFA</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="alert alert-secondary text-center">
+                                <small>Total (epargne + interets)</small>
+                                <h4>{{ "{:,.0f}".format(member.total_with_interest) }} FCFA</h4>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5>Date de debut</h5>
+                                    <p>{{ member.start_date.strftime('%d/%m/%Y') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5>Jours payes</h5>
+                                    <p class="display-6">{{ member.total_days_paid }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card text-center {% if member.days_missing > 0 %}border-danger{% endif %}">
+                                <div class="card-body">
+                                    <h5>Jours de retard</h5>
+                                    <p class="display-6 text-{% if member.days_missing > 0 %}danger{% else %}success{% endif %}">
+                                        {{ member.days_missing }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Prochaines echeances -->
+                    {% if next_dates %}
+                    <div class="alert alert-warning">
+                        <strong>⚠️ Prochaines echeances :</strong>
+                        <ul class="mb-0 mt-2">
+                            {% for date in next_dates[:5] %}
+                            <li>{{ date.strftime('%d/%m/%Y') }} - {{ "{:,.0f}".format(member.daily_amount) }} FCFA</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Formulaire de paiement -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">Effectuer un versement</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('tontine.pay', member_id=member.id) }}" class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">Nombre de jours</label>
+                                    <select name="days" class="form-control">
+                                        <option value="1">1 jour ({{ "{:,.0f}".format(member.daily_amount) }} FCFA)</option>
+                                        <option value="2">2 jours ({{ "{:,.0f}".format(member.daily_amount * 2) }} FCFA)</option>
+                                        <option value="3">3 jours ({{ "{:,.0f}".format(member.daily_amount * 3) }} FCFA)</option>
+                                        <option value="5">5 jours ({{ "{:,.0f}".format(member.daily_amount * 5) }} FCFA)</option>
+                                        <option value="7">7 jours ({{ "{:,.0f}".format(member.daily_amount * 7) }} FCFA)</option>
+                                        <option value="10">10 jours ({{ "{:,.0f}".format(member.daily_amount * 10) }} FCFA)</option>
+                                        <option value="15">15 jours ({{ "{:,.0f}".format(member.daily_amount * 15) }} FCFA)</option>
+                                        <option value="30">30 jours ({{ "{:,.0f}".format(member.daily_amount * 30) }} FCFA)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-success w-100">💰 Enregistrer le paiement</button>
+                                </div>
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <small class="text-muted">Le paiement commence a partir d'aujourd'hui</small>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Historique des paiements -->
+                    <h5>📜 Historique des versements</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Montant</th>
+                                    <th>Jours couverts</th>
+                                    <th>Date paiement</th>
+                                    <th>Agent</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in payments %}
+                                <tr>
+                                    <td>{{ payment.payment_date.strftime('%d/%m/%Y') }}</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                                    <td>{{ "{:,.0f}".format(payment.amount) }} FCFA</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                                    <td>{{ payment.days_covered }} jour(s)</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                                    <td>{{ payment.paid_at.strftime('%d/%m/%Y %H:%M') if payment.paid_at else '-' }}</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                                    <td>{{ payment.user.full_name if payment.user else '-' }}</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center">Aucun versement</a></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('tontine.index') }}" class="btn btn-secondary">← Retour</a>
+                        {% if member.can_withdraw %}
+                        <a href="{{ url_for('tontine.unregister', member_id=member.id) }}" class="btn btn-danger" onclick="return confirm('Retirer ce membre de la tontine ? Le montant total lui sera verse.')">
+                            💸 Retirer de la tontine
+                        </a>
+                        {% else %}
+                        <button class="btn btn-secondary" disabled title="Retrait possible apres 60 jours">
+                            ⏳ Retrait dans {{ 60 - (today - member.start_date).days }} jours
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -9,3 +9,4 @@ from app.models.holiday import Holiday
 from app.models.solidarity_group import SolidarityGroup, GroupMember
 from app.models.cash_fund import CashFund, CashTransaction
 from app.models.savings_account import SavingsAccount, SavingsTransaction
+from app.models.tontine import TontineMember, TontinePayment

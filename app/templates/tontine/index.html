@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Tontine - Epargne quotidienne{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>💰 Tontine - Epargne quotidienne</h1>
+        <a href="{{ url_for('clients.index') }}" class="btn btn-primary">
+            + Inscrire un client
+        </a>
+    </div>
+    
+    <!-- Statistiques globales -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h5>Membres actifs</h5>
+                    <h2>{{ stats.total_members }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h5>Total epargne</h5>
+                    <h4>{{ "{:,.0f}".format(stats.total_saved) }} FCFA</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <h5>Interets generes</h5>
+                    <h4>{{ "{:,.0f}".format(stats.total_interest) }} FCFA</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                    <h5>Jours de retard</h5>
+                    <h2>{{ stats.total_missing_days }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Liste des membres -->
+    <div class="card shadow">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">Membres inscrits</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Client</th>
+                            <th>Montant/jour</th>
+                            <th>Date debut</th>
+                            <th>Total epargne</th>
+                            <th>Jours payes</th>
+                            <th>Retard</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for member in members %}
+                        <tr class="{% if member.days_missing > 0 %}table-danger{% endif %}">
+                            <td>{{ member.client.full_name }}</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                            <td>{{ "{:,.0f}".format(member.daily_amount) }} FCFA</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                            <td>{{ member.start_date.strftime('%d/%m/%Y') }}</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                            <td>{{ "{:,.0f}".format(member.total_paid) }} FCFA</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                            <td>{{ member.total_days_paid }}</a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></a></td>
+                            <td>
+                                {% if member.days_missing > 0 %}
+                                    <span class="badge bg-danger">{{ member.days_missing }} jours</span>
+                                {% else %}
+                                    <span class="badge bg-success">A jour</span>
+                                {% endif %}
+                            </a>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('tontine.view_member', member_id=member.id) }}" class="btn btn-info">Voir</a>
+                                    <a href="{{ url_for('tontine.edit', member_id=member.id) }}" class="btn btn-warning">Modifier</a>
+                                    <a href="{{ url_for('tontine.unregister', member_id=member.id) }}" class="btn btn-danger" onclick="return confirm('Retirer ce membre de la tontine ?')">Retirer</a>
+                                </div>
+                            </a>
+                         </a>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center">Aucun membre inscrit</a></td>
+                         </a>
+                        {% endfor %}
+                    </tbody>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

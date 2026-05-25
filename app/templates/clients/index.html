@@ -140,6 +140,9 @@
                             </td>
                             <td>
                                 <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{{ url_for('tontine.register', client_id=client.id) }}" class="btn-action tontine" title="Inscription Tontine">
+                                        <i class="fas fa-coins"></i>
+                                    </a>
                                     <a href="{{ url_for('clients.edit', id=client.id) }}" class="btn-action edit" title="Modifier">
                                         <i class="fas fa-edit"></i>
                                     </a>
